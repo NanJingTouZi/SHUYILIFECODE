@@ -1170,12 +1170,13 @@ const RELATION_DATA = [
 // CONFIGURATION
 // ============================================================
 const CONFIG = {
-    IS_LOCAL: true,
-    GITHUB_RAW_URL: 'https://raw.githubusercontent.com/username/repo/main/data/',
-    GITHUB_API_URL: 'https://api.github.com/repos/username/repo/contents/data/',
+    IS_LOCAL: false,
+    GITHUB_RAW_URL: 'https://raw.githubusercontent.com/nanjingtouzi/SHUYILIFECODE/main/data/',
+    GITHUB_API_URL: 'https://api.github.com/repos/nanjingtouzi/SHUYILIFECODE/contents/data/',
     GITHUB_TOKEN: '',
     SENDGRID_API_KEY: '',
-    ADMIN_PHONE: '6281944142311',  // ← GANTI DENGAN NOMOR ADMIN ANDA
+    MAILTRAP_API_KEY: '64b1053acc353e5531cebf83550e6d20',
+    ADMIN_PHONE: '6281944142311',
     ADMIN_EMAIL: 'admin@domain.com',
     DEFAULT_QUOTA: 5,
     DEFAULT_DAYS: 30
@@ -1485,8 +1486,63 @@ function verifyOTP(email, code) {
 function sendOTP(email) {
     const otp = generateOTP();
     saveOTP(email, otp);
-    console.log('📧 [LOCAL] OTP untuk ' + email + ': ' + otp);
-    console.log('💡 Gunakan kode ini untuk verifikasi (mode lokal)');
+    
+    // Kirim via Mailtrap API
+    if (!CONFIG.IS_LOCAL && CONFIG.MAILTRAP_API_KEY) {
+        fetch('https://send.api.mailtrap.io/api/send', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + CONFIG.MAILTRAP_API_KEY,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                from: { 
+                    email: 'noreply@yourdomain.com', 
+                    name: 'Angka Kehidupan' 
+                },
+                to: [{ email: email }],
+                subject: '🔐 Kode Verifikasi Angka Kehidupan',
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; background: #f8f6f0; border-radius: 12px;">
+                        <h1 style="color: #c9a24a; text-align: center; font-size: 24px;">🔮 Kalkulator Angka Kehidupan</h1>
+                        <div style="background: white; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                            <h2 style="color: #1b2427; text-align: center; font-size: 20px;">🔐 Kode Verifikasi Anda</h2>
+                            <div style="text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #c9a24a; padding: 16px 0; background: #f3ede0; border-radius: 8px; margin: 16px 0;">
+                                ${otp}
+                            </div>
+                            <p style="color: #4a4a44; font-size: 14px; text-align: center;">
+                                Masukkan kode di atas ke aplikasi untuk menyelesaikan registrasi Anda.
+                            </p>
+                            <p style="color: #999; font-size: 12px; text-align: center; margin-top: 16px;">
+                                ⏰ Kode berlaku 5 menit
+                            </p>
+                            <p style="color: #ccc; font-size: 11px; text-align: center; margin-top: 8px;">
+                                ❓ Tidak meminta kode ini? Abaikan email ini.
+                            </p>
+                        </div>
+                        <p style="color: #999; font-size: 11px; text-align: center; margin-top: 16px;">
+                            © 2026 Kalkulator Angka Kehidupan · Untuk refleksi & hiburan pribadi
+                        </p>
+                    </div>
+                `,
+                text: 'Kode Verifikasi Anda: ' + otp + '\n\nKode berlaku 5 menit.\n\nTidak meminta kode ini? Abaikan email ini.'
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('📧 Email OTP terkirim ke ' + email);
+            } else {
+                console.log('❌ Gagal kirim email:', response.status);
+            }
+        })
+        .catch(error => {
+            console.log('❌ Error kirim email:', error);
+        });
+    } else {
+        console.log('📧 [LOCAL] OTP untuk ' + email + ': ' + otp);
+        console.log('💡 Gunakan kode ini untuk verifikasi (mode lokal)');
+    }
+    
     return true;
 }
 
