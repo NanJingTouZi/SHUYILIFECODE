@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#12181a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+<title>角数命理 · Kalkulator Angka Kehidupan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BAGIAN 1: CSS (part1.css)
+   ============================================================ */
+</style>
+<!-- === MASUKKAN ISI part1.css DI SINI === -->
+<style>
+/* ============================================================
+   AKHIR BAGIAN 1
+   ============================================================ */
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
+  <div class="hero">
+    <div class="seal">生辰數理 · Life Number</div>
+    <h1>Kalkulator <em>Angka Kehidupan</em></h1>
+    <p>Masukkan nama dan tanggal lahir — profil karakter, elemen, shio, angka kehidupan, hingga ramalan tahun ini akan tersusun otomatis.</p>
+    <div class="hanzi-row">鼠 牛 虎 兔 龍 蛇 馬 羊 猴 雞 狗 豬</div>
+  </div>
+
+  <!-- ============================================================
+       USER STATUS BAR
+       ============================================================ -->
+  <div id="userStatusBar" style="display:none;" class="user-status-bar">
+    <span class="user-name" id="displayName">—</span>
+    <span class="status-item">📊 Kuota: <span class="val success" id="displayKuota">5/5</span></span>
+    <span class="status-item">⏰ Masa Aktif: <span class="val" id="displayMasaAktif">30</span> hari</span>
+    <span class="status-item">📅 Expired: <span class="val" id="displayExpired">2026-08-16</span></span>
+    <div style="flex:1;"></div>
+    <button class="token-btn" id="historyBtn">📊 Riwayat</button>
+    <button class="token-btn" id="tokenBtn">🔑 Token</button>
+    <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
+  </div>
+
+  <!-- ============================================================
+       LICENSE WARNING
+       ============================================================ -->
+  <div id="licenseWarning" class="license-warning">
+    <div class="title">⚠️ LISENSI ANDA TELAH HABIS</div>
+    <div class="desc" id="licenseWarningDesc">Kuota atau masa aktif Anda telah habis. Hubungi admin untuk perpanjang.</div>
+    <a href="#" id="waLink" class="wa-link" target="_blank">📱 Hubungi Admin via WhatsApp</a>
+  </div>
+
+  <!-- ============================================================
+       FORM INPUT
+       ============================================================ -->
+  <div class="card" id="formCard">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="fname">Nama <span style="font-weight:400;font-size:10px;color:var(--paper-dim);">(yang akan dihitung)</span></label>
+        <input type="text" id="fname" placeholder="cth. Su Yhi">
+      </div>
+      <div>
+        <label>Tanggal Lahir <span style="font-weight:400;font-size:10px;color:var(--paper-dim);">(dd/mm/yyyy)</span></label>
+        <div class="date-group">
+          <div class="date-part">
+            <input type="text" id="dobDay" placeholder="DD" maxlength="2" inputmode="numeric">
+            <span class="date-label">Hari</span>
+          </div>
+          <span class="date-sep">/</span>
+          <div class="date-part">
+            <input type="text" id="dobMonth" placeholder="MM" maxlength="2" inputmode="numeric">
+            <span class="date-label">Bulan</span>
+          </div>
+          <span class="date-sep">/</span>
+          <div class="date-part">
+            <input type="text" id="dobYear" placeholder="YYYY" maxlength="4" inputmode="numeric">
+            <span class="date-label">Tahun</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="btn" id="calcBtn">Hitung Angka Kehidupan</button>
+      <button class="btn btn-outline" id="printBtn" style="display:none;">🖨 Cetak PDF</button>
+    </div>
+    <div class="err" id="errBox"></div>
+  </div>
+
+  <!-- ============================================================
+       RESULTS
+       ============================================================ -->
+  <div id="results"></div>
+
+  <!-- ============================================================
+       FOOTNOTE
+       ============================================================ -->
+  <div class="footnote">
+    Dibuat berdasarkan struktur perhitungan pada template "SU YHI LIFE NUMBER".<br>
+    Untuk refleksi &amp; hiburan pribadi — bukan pengganti nasihat profesional apa pun.
+  </div>
+</div>
+
+<!-- ============================================================
+   BAGIAN 2: MODAL HTML (part2.html)
+   ============================================================ -->
+<!-- === MASUKKAN ISI part2.html DI SINI === -->
+
+<!-- ============================================================
+   BAGIAN 3: JAVASCRIPT (part3.js)
+   ============================================================ -->
+<script>
+/* === MASUKKAN ISI part3.js DI SINI === */
+</script>
+</body>
+</html>

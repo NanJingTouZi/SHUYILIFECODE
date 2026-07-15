@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#12181a">
+<title>Admin Dashboard · Angka Kehidupan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12181a;
+  --ink-2:#1b2427;
+  --panel:#1f2a2d;
+  --panel-2:#242f32;
+  --gold:#c9a24a;
+  --gold-soft:#e4c988;
+  --jade:#4f8a72;
+  --jade-soft:#7fb59c;
+  --cinnabar:#b4483a;
+  --paper:#f3ede0;
+  --paper-dim:#cfc6b0;
+  --line: rgba(201,162,74,0.22);
+  --shadow: 0 20px 60px rgba(0,0,0,0.45);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1200px 700px at 85% -10%, rgba(79,138,114,0.18), transparent 60%),
+    radial-gradient(900px 600px at -10% 20%, rgba(201,162,74,0.10), transparent 55%),
+    var(--ink);
+  color:var(--paper);
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  line-height:1.5;
+}
+.wrap{max-width:1200px;margin:0 auto;padding:40px 22px 60px;}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-bottom:20px;border-bottom:1px solid var(--line);
+  margin-bottom:30px;flex-wrap:wrap;gap:12px;
+}
+.header h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;font-weight:600;color:var(--gold-soft);margin:0;
+}
+.header .sub{color:var(--paper-dim);font-size:13px;opacity:0.6;margin-top:2px;}
+.header .logout-btn{
+  background:transparent;border:1px solid var(--cinnabar);color:#e0968a;
+  border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer;
+  transition:background .15s;font-family:'Inter',sans-serif;
+}
+.header .logout-btn:hover{background:rgba(180,72,58,0.15);}
+
+/* ============================================================
+   PIN LOGIN
+   ============================================================ */
+.pin-overlay{
+  display:flex;
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.85);
+  z-index:1000;
+  justify-content:center;align-items:center;
+  backdrop-filter:blur(4px);
+}
+.pin-overlay.hidden{display:none;}
+.pin-box{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:40px 44px;
+  max-width:380px;
+  width:90%;
+  box-shadow:var(--shadow);
+  text-align:center;
+}
+.pin-box .icon{font-size:56px;margin-bottom:8px;}
+.pin-box h2{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold-soft);margin:0 0 4px;}
+.pin-box p{color:var(--paper-dim);font-size:13px;margin:0 0 20px;}
+.pin-box input{
+  width:100%;padding:14px;border-radius:10px;
+  border:1px solid rgba(201,162,74,0.3);
+  background:rgba(0,0,0,0.25);
+  color:var(--paper);font-size:18px;font-family:'Inter',sans-serif;
+  outline:none;text-align:center;letter-spacing:4px;
+  transition:border-color .15s, box-shadow .15s;
+}
+.pin-box input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,74,0.15);}
+.pin-box .btn{
+  width:100%;margin-top:16px;
+  background:linear-gradient(135deg,var(--gold),#a9843a);
+  color:#1a1408;border:none;border-radius:10px;
+  padding:14px;font-size:16px;font-weight:700;cursor:pointer;
+  transition:transform .12s, box-shadow .12s;font-family:'Inter',sans-serif;
+}
+.pin-box .btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(201,162,74,0.3);}
+.pin-box .err{color:var(--cinnabar);font-size:13px;margin-top:10px;display:none;}
+
+/* ============================================================
+   STATS
+   ============================================================ */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;
+  margin-bottom:28px;
+}
+.stat-card{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--line);border-radius:12px;
+  padding:16px 20px;text-align:center;
+}
+.stat-card .num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:36px;font-weight:700;color:var(--gold-soft);
+  line-height:1.2;
+}
+.stat-card .num.green{color:var(--jade-soft);}
+.stat-card .num.red{color:#e0968a;}
+.stat-card .num.orange{color:#f0b84d;}
+.stat-card .label{color:var(--paper-dim);font-size:12px;margin-top:2px;}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+.table-container{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--line);border-radius:12px;
+  overflow:hidden;margin-bottom:28px;
+}
+.table-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap;gap:10px;
+}
+.table-header h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;color:var(--gold-soft);margin:0;
+}
+.table-header .badge{
+  background:rgba(201,162,74,0.15);color:var(--gold-soft);
+  padding:2px 12px;border-radius:12px;font-size:12px;font-weight:600;
+}
+.table-controls{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+}
+.table-controls input, .table-controls select{
+  padding:8px 12px;border-radius:8px;
+  border:1px solid rgba(201,162,74,0.2);
+  background:rgba(0,0,0,0.25);
+  color:var(--paper);font-size:13px;font-family:'Inter',sans-serif;
+  outline:none;
+}
+.table-controls input:focus, .table-controls select:focus{
+  border-color:var(--gold);
+}
+.table-controls .btn-sm{
+  background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft);
+  border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:background .15s;
+}
+.table-controls .btn-sm:hover{background:rgba(201,162,74,0.1);}
+.table-controls .btn-sm.green{
+  border-color:var(--jade);color:var(--jade-soft);
+}
+.table-controls .btn-sm.green:hover{background:rgba(79,138,114,0.15);}
+.table-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+table th{
+  text-align:left;padding:10px 14px;color:var(--paper-dim);
+  border-bottom:1px solid var(--line);font-weight:600;font-size:11px;
+  text-transform:uppercase;letter-spacing:0.06em;
+  background:rgba(0,0,0,0.15);
+  white-space:nowrap;
+}
+table td{padding:9px 14px;border-bottom:1px solid rgba(201,162,74,0.06);color:var(--paper);}
+table tr:hover td{background:rgba(201,162,74,0.04);}
+table .status-active{color:var(--jade-soft);font-weight:600;}
+table .status-expired{color:#e0968a;font-weight:600;}
+table .status-blocked{color:var(--paper-dim);font-weight:600;}
+table .status-warning{color:#f0b84d;font-weight:600;}
+table .code-used{color:var(--paper-dim);}
+table .code-available{color:var(--jade-soft);font-weight:600;}
+.copy-btn{
+  background:transparent;border:none;color:var(--gold-soft);cursor:pointer;
+  font-size:13px;padding:2px 6px;border-radius:4px;
+  transition:background .15s;
+}
+.copy-btn:hover{background:rgba(201,162,74,0.15);}
+.delete-btn{
+  background:transparent;border:none;color:#e0968a;cursor:pointer;
+  font-size:13px;padding:2px 6px;border-radius:4px;
+  transition:background .15s;
+}
+.delete-btn:hover{background:rgba(180,72,58,0.15);}
+
+/* ============================================================
+   GENERATE CODE SECTION
+   ============================================================ */
+.generate-section{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--line);border-radius:12px;
+  padding:20px 24px;margin-bottom:28px;
+}
+.generate-section h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;color:var(--gold-soft);margin:0 0 12px;
+}
+.generate-form{
+  display:flex;gap:14px;flex-wrap:wrap;align-items:end;
+}
+.generate-form .form-group{flex:1;min-width:120px;}
+.generate-form .form-group label{
+  display:block;font-size:11px;text-transform:uppercase;
+  color:var(--paper-dim);margin-bottom:4px;letter-spacing:0.06em;
+}
+.generate-form .form-group input, .generate-form .form-group select{
+  width:100%;padding:8px 12px;border-radius:8px;
+  border:1px solid rgba(201,162,74,0.2);
+  background:rgba(0,0,0,0.25);
+  color:var(--paper);font-size:13px;font-family:'Inter',sans-serif;
+  outline:none;
+}
+.generate-form .form-group input:focus, .generate-form .form-group select:focus{
+  border-color:var(--gold);
+}
+.generate-form .btn{
+  background:linear-gradient(135deg,var(--jade),#3d705a);
+  color:#fff;border:none;border-radius:8px;
+  padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:transform .12s, box-shadow .12s;
+  min-width:140px;
+}
+.generate-form .btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(79,138,114,0.3);}
+.generate-result{
+  margin-top:14px;padding:12px 16px;
+  background:rgba(0,0,0,0.2);border-radius:8px;
+  display:none;flex-wrap:wrap;gap:8px;
+}
+.generate-result .code-chip{
+  background:rgba(201,162,74,0.12);
+  border:1px solid rgba(201,162,74,0.2);
+  border-radius:6px;padding:4px 10px;
+  font-family:'Cormorant Garamond',serif;
+  font-size:14px;color:var(--gold-soft);
+  display:flex;align-items:center;gap:8px;
+}
+.generate-result .code-chip .copy-btn{font-size:14px;}
+
+/* ============================================================
+   TAB
+   ============================================================ */
+.tabs{display:flex;gap:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tabs .tab{
+  padding:8px 20px;border-radius:8px 8px 0 0;
+  background:transparent;border:none;color:var(--paper-dim);
+  font-size:13px;font-weight:600;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:all .15s;
+  border-bottom:2px solid transparent;
+}
+.tabs .tab:hover{color:var(--paper);}
+.tabs .tab.active{
+  color:var(--gold-soft);border-bottom-color:var(--gold);
+}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:768px){
+  .generate-form{flex-direction:column;align-items:stretch;}
+  .generate-form .form-group{min-width:auto;}
+  .generate-form .btn{width:100%;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .table-header{flex-direction:column;align-items:stretch;}
+  .table-controls{flex-wrap:wrap;}
+}
+@media (max-width:480px){
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .header h1{font-size:22px;}
+  .pin-box{padding:28px 20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+   PIN OVERLAY
+   ============================================================ -->
+<div class="pin-overlay" id="pinOverlay">
+  <div class="pin-box">
+    <div class="icon">🔐</div>
+    <h2>Admin Access</h2>
+    <p>Masukkan PIN untuk mengakses dashboard.</p>
+    <input type="password" id="pinInput" placeholder="••••••" maxlength="6" inputmode="numeric">
+    <button class="btn" id="pinSubmitBtn">Masuk</button>
+    <div class="err" id="pinErr">PIN salah. Silakan coba lagi.</div>
+  </div>
+</div>
+
+<!-- ============================================================
+   DASHBOARD
+   ============================================================ -->
+<div class="wrap" id="dashboardWrap" style="display:none;">
+
+  <div class="header">
+    <div>
+      <h1>📊 Admin Dashboard</h1>
+      <div class="sub">Angka Kehidupan · Manajemen User & Lisensi</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span id="adminTime" style="color:var(--paper-dim);font-size:13px;"></span>
+      <button class="logout-btn" id="adminLogoutBtn">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card">
+      <div class="num" id="statTotal">0</div>
+      <div class="label">👥 Total User</div>
+    </div>
+    <div class="stat-card">
+      <div class="num green" id="statActive">0</div>
+      <div class="label">✅ Lisensi Aktif</div>
+    </div>
+    <div class="stat-card">
+      <div class="num red" id="statExpired">0</div>
+      <div class="label">❌ Lisensi Habis</div>
+    </div>
+    <div class="stat-card">
+      <div class="num orange" id="statWarning">0</div>
+      <div class="label">⚠️ Akan Habis (≤7 hari)</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statCodes">0</div>
+      <div class="label">📦 Token Tersedia</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statHistory">0</div>
+      <div class="label">📊 Total Perhitungan</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-tab="users">👥 User</button>
+    <button class="tab" data-tab="licenses">📋 Lisensi</button>
+    <button class="tab" data-tab="codes">🔑 Token</button>
+    <button class="tab" data-tab="history">📊 Riwayat</button>
+  </div>
+
+  <!-- Tab: Users -->
+  <div class="tab-content active" id="tab-users">
+    <div class="table-container">
+      <div class="table-header">
+        <h3>👥 Daftar User</h3>
+        <div class="table-controls">
+          <input type="text" id="userSearch" placeholder="Cari nama/email..." style="min-width:180px;">
+          <select id="userFilter">
+            <option value="all">Semua</option>
+            <option value="active">✅ Aktif</option>
+            <option value="expired">❌ Habis</option>
+            <option value="warning">⚠️ Akan Habis</option>
+          </select>
+          <button class="btn-sm" id="refreshUsersBtn">🔄 Refresh</button>
+          <button class="btn-sm green" id="exportExcelBtn">📥 Export Excel</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama</th>
+              <th>Email</th>
+              <th>HP</th>
+              <th>Registrasi</th>
+              <th>Status Lisensi</th>
+              <th>Sisa Kuota</th>
+              <th>Hari Tersisa</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="8" style="text-align:center;color:var(--paper-dim);padding:30px;">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Licenses -->
+  <div class="tab-content" id="tab-licenses">
+    <div class="table-container">
+      <div class="table-header">
+        <h3>📋 Daftar Lisensi</h3>
+        <div class="table-controls">
+          <input type="text" id="licenseSearch" placeholder="Cari email..." style="min-width:180px;">
+          <button class="btn-sm" id="refreshLicensesBtn">🔄 Refresh</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Email</th>
+              <th>Kunci</th>
+              <th>Kuota</th>
+              <th>Terpakai</th>
+              <th>Sisa</th>
+              <th>Expired</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="licensesTableBody">
+            <tr><td colspan="8" style="text-align:center;color:var(--paper-dim);padding:30px;">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Codes / Token -->
+  <div class="tab-content" id="tab-codes">
+    <!-- Generate Section -->
+    <div class="generate-section">
+      <h3>🔑 Generate Token Perpanjang</h3>
+      <div class="generate-form">
+        <div class="form-group">
+          <label>Jenis Token</label>
+          <select id="genType">
+            <option value="time">⏰ Waktu (+30 hari)</option>
+            <option value="time90">⏰ Waktu (+90 hari)</option>
+            <option value="quota">📊 Kuota (+10 kali)</option>
+            <option value="both">⏰+📊 Keduanya (+30 hari + 10 kali)</option>
+          </select>
+        </div>
+        <div class="form-group" style="min-width:100px;">
+          <label>Jumlah</label>
+          <input type="number" id="genCount" value="5" min="1" max="50">
+        </div>
+        <button class="btn" id="generateBtn">🚀 Generate Token</button>
+      </div>
+      <div class="generate-result" id="generateResult"></div>
+    </div>
+
+    <!-- Codes Table -->
+    <div class="table-container">
+      <div class="table-header">
+        <h3>📦 Daftar Token</h3>
+        <div class="table-controls">
+          <select id="codeFilter">
+            <option value="all">Semua</option>
+            <option value="available">✅ Tersedia</option>
+            <option value="used">❌ Terpakai</option>
+          </select>
+          <button class="btn-sm" id="refreshCodesBtn">🔄 Refresh</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Token</th>
+              <th>Type</th>
+              <th>Durasi</th>
+              <th>Kuota</th>
+              <th>Status</th>
+              <th>Dipakai Oleh</th>
+              <th>Tanggal</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="codesTableBody">
+            <tr><td colspan="9" style="text-align:center;color:var(--paper-dim);padding:30px;">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: History -->
+  <div class="tab-content" id="tab-history">
+    <div class="table-container">
+      <div class="table-header">
+        <h3>📊 Riwayat Perhitungan</h3>
+        <div class="table-controls">
+          <input type="text" id="historySearch" placeholder="Cari nama/email..." style="min-width:180px;">
+          <button class="btn-sm" id="refreshHistoryBtn">🔄 Refresh</button>
+          <button class="btn-sm green" id="exportHistoryBtn">📥 Export CSV</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User</th>
+              <th>Nama Dihitung</th>
+              <th>Tanggal Lahir</th>
+              <th>Waktu</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <tr><td colspan="5" style="text-align:center;color:var(--paper-dim);padding:30px;">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const ADMIN_PIN = '123456';
+const IS_LOCAL = true;
+
+// ============================================================
+// DATA STORE
+// ============================================================
+const DATA = {
+    users: {},
+    licenses: {},
+    codes: {},
+    history: {}
+};
+
+// ============================================================
+// LOAD DATA
+// ============================================================
+function loadLocalData() {
+    const keys = ['users', 'licenses', 'codes', 'history'];
+    keys.forEach(key => {
+        const data = localStorage.getItem('local_' + key);
+        if (data) {
+            DATA[key] = JSON.parse(data);
+        } else {
+            DATA[key] = {};
+        }
+    });
+}
+
+function loadData() {
+    if (IS_LOCAL) {
+        loadLocalData();
+        return true;
+    }
+    return true;
+}
+
+// ============================================================
+// PIN LOGIN
+// ============================================================
+document.getElementById('pinSubmitBtn').addEventListener('click', function() {
+    const pin = document.getElementById('pinInput').value;
+    const errEl = document.getElementById('pinErr');
+    if (pin === ADMIN_PIN) {
+        document.getElementById('pinOverlay').classList.add('hidden');
+        document.getElementById('dashboardWrap').style.display = 'block';
+        loadData();
+        renderAll();
+        updateClock();
+        setInterval(updateClock, 60000);
+    } else {
+        errEl.style.display = 'block';
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinInput').focus();
+        setTimeout(() => { errEl.style.display = 'none'; }, 3000);
+    }
+});
+
+document.getElementById('pinInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('pinSubmitBtn').click();
+    }
+});
+
+// ============================================================
+// CLOCK
+// ============================================================
+function updateClock() {
+    const now = new Date();
+    document.getElementById('adminTime').textContent = now.toLocaleString('id-ID');
+}
+
+// ============================================================
+// ADMIN LOGOUT
+// ============================================================
+document.getElementById('adminLogoutBtn').addEventListener('click', function() {
+    if (confirm('Yakin ingin logout dari admin dashboard?')) {
+        document.getElementById('pinOverlay').classList.remove('hidden');
+        document.getElementById('dashboardWrap').style.display = 'none';
+        document.getElementById('pinInput').value = '';
+    }
+});
+
+// ============================================================
+// TABS
+// ============================================================
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+        renderAll();
+    });
+});
+
+// ============================================================
+// RENDER FUNCTIONS
+// ============================================================
+function renderAll() {
+    renderStats();
+    renderUsers();
+    renderLicenses();
+    renderCodes();
+    renderHistory();
+}
+
+// ============================================================
+// RENDER STATS
+// ============================================================
+function renderStats() {
+    const users = DATA.users || {};
+    const licenses = DATA.licenses || {};
+    const codes = DATA.codes || {};
+    const history = DATA.history || {};
+    
+    const total = Object.keys(users).length;
+    let active = 0, expired = 0, warning = 0;
+    let totalHistory = 0;
+    
+    for (const key in licenses) {
+        const lic = licenses[key];
+        if (!lic.is_active) {
+            expired++;
+        } else {
+            const expiry = new Date(lic.expiry_date);
+            const now = new Date();
+            const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+            if (daysLeft <= 7 && daysLeft >= 0) {
+                warning++;
+            }
+            active++;
+        }
+    }
+    
+    for (const email in history) {
+        totalHistory += history[email].length;
+    }
+    
+    const availableCodes = Object.keys(codes).filter(key => !codes[key].used).length;
+    
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statActive').textContent = active;
+    document.getElementById('statExpired').textContent = expired;
+    document.getElementById('statWarning').textContent = warning;
+    document.getElementById('statCodes').textContent = availableCodes;
+    document.getElementById('statHistory').textContent = totalHistory;
+}
+
+// ============================================================
+// RENDER USERS
+// ============================================================
+function renderUsers() {
+    const users = DATA.users || {};
+    const licenses = DATA.licenses || {};
+    const search = (document.getElementById('userSearch').value || '').toLowerCase();
+    const filter = document.getElementById('userFilter').value;
+    const tbody = document.getElementById('usersTableBody');
+    
+    let emails = Object.keys(users);
+    let html = '';
+    let no = 0;
+    
+    emails.forEach(email => {
+        const user = users[email];
+        const lic = getLicenseByEmail(email);
+        
+        if (search && !email.toLowerCase().includes(search) && !(user.name || '').toLowerCase().includes(search)) {
+            return;
+        }
+        
+        let status = 'active', statusText = '✅ Aktif', statusClass = 'status-active';
+        let remaining = '-', daysLeft = '-', quota = '-', used = '-';
+        
+        if (lic) {
+            quota = lic.quota || 0;
+            used = lic.used_count || 0;
+            remaining = quota - used;
+            const expiry = new Date(lic.expiry_date);
+            const now = new Date();
+            daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+            
+            if (!lic.is_active) {
+                status = 'expired';
+                statusText = '❌ Habis';
+                statusClass = 'status-expired';
+            } else if (daysLeft < 0) {
+                status = 'expired';
+                statusText = '❌ Habis';
+                statusClass = 'status-expired';
+            } else if (daysLeft <= 7) {
+                status = 'warning';
+                statusText = '⚠️ ' + daysLeft + ' hari';
+                statusClass = 'status-warning';
+            } else {
+                statusText = '✅ ' + daysLeft + ' hari';
+                statusClass = 'status-active';
+            }
+        } else {
+            status = 'expired';
+            statusText = '❌ Tidak ada';
+            statusClass = 'status-expired';
+        }
+        
+        if (filter === 'active' && status !== 'active') return;
+        if (filter === 'expired' && status !== 'expired') return;
+        if (filter === 'warning' && status !== 'warning') return;
+        
+        no++;
+        html += '<tr>';
+        html += '<td>' + no + '</td>';
+        html += '<td>' + esc(user.name || '-') + '</td>';
+        html += '<td>' + esc(email) + '</td>';
+        html += '<td>' + esc(user.phone || '-') + '</td>';
+        html += '<td>' + (user.registered_at ? new Date(user.registered_at).toLocaleDateString('id-ID') : '-') + '</td>';
+        html += '<td class="' + statusClass + '">' + statusText + '</td>';
+        html += '<td>' + remaining + '/' + quota + '</td>';
+        html += '<td>' + (daysLeft !== '-' ? daysLeft : '-') + '</td>';
+        html += '</tr>';
+    });
+    
+    if (no === 0) {
+        html = '<tr><td colspan="8" style="text-align:center;color:var(--paper-dim);padding:30px;">Tidak ada data.</td></tr>';
+    }
+    tbody.innerHTML = html;
+}
+
+// ============================================================
+// RENDER LICENSES
+// ============================================================
+function renderLicenses() {
+    const licenses = DATA.licenses || {};
+    const search = (document.getElementById('licenseSearch').value || '').toLowerCase();
+    const tbody = document.getElementById('licensesTableBody');
+    
+    let keys = Object.keys(licenses);
+    let html = '';
+    let no = 0;
+    
+    keys.forEach(key => {
+        const lic = licenses[key];
+        if (search && !lic.user_email.toLowerCase().includes(search)) return;
+        
+        no++;
+        const remaining = lic.quota - lic.used_count;
+        const expiry = new Date(lic.expiry_date);
+        const now = new Date();
+        const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+        
+        let statusText, statusClass;
+        if (!lic.is_active || daysLeft < 0) {
+            statusText = '❌ Habis';
+            statusClass = 'status-expired';
+        } else if (daysLeft <= 7) {
+            statusText = '⚠️ ' + daysLeft + ' hari';
+            statusClass = 'status-warning';
+        } else {
+            statusText = '✅ ' + daysLeft + ' hari';
+            statusClass = 'status-active';
+        }
+        
+        html += '<tr>';
+        html += '<td>' + no + '</td>';
+        html += '<td>' + esc(lic.user_email) + '</td>';
+        html += '<td style="font-family:Cormorant Garamond,serif;color:var(--gold-soft);">' + esc(key) + '</td>';
+        html += '<td>' + lic.quota + '</td>';
+        html += '<td>' + lic.used_count + '</td>';
+        html += '<td>' + remaining + '</td>';
+        html += '<td>' + lic.expiry_date + '</td>';
+        html += '<td class="' + statusClass + '">' + statusText + '</td>';
+        html += '</tr>';
+    });
+    
+    if (no === 0) {
+        html = '<tr><td colspan="8" style="text-align:center;color:var(--paper-dim);padding:30px;">Tidak ada data.</td></tr>';
+    }
+    tbody.innerHTML = html;
+}
+
+// ============================================================
+// RENDER CODES
+// ============================================================
+function renderCodes() {
+    const codes = DATA.codes || {};
+    const filter = document.getElementById('codeFilter').value;
+    const tbody = document.getElementById('codesTableBody');
+    
+    let keys = Object.keys(codes);
+    let html = '';
+    let no = 0;
+    
+    keys.forEach(key => {
+        const code = codes[key];
+        if (filter === 'available' && code.used) return;
+        if (filter === 'used' && !code.used) return;
+        
+        no++;
+        const statusText = code.used ? '❌ Terpakai' : '✅ Tersedia';
+        const statusClass = code.used ? 'code-used' : 'code-available';
+        const usedBy = code.used_by || '-';
+        const usedAt = code.used_at ? new Date(code.used_at).toLocaleDateString('id-ID') : '-';
+        const created = code.created_at || '-';
+        
+        let typeText = '-';
+        if (code.type === 'time') typeText = '⏰ ' + (code.duration || 0) + ' hari';
+        else if (code.type === 'quota') typeText = '📊 +' + (code.amount || 0) + ' kali';
+        else if (code.type === 'both') typeText = '⏰ +' + (code.duration || 0) + 'h 📊 +' + (code.amount || 0) + 'x';
+        
+        html += '<tr>';
+        html += '<td>' + no + '</td>';
+        html += '<td style="font-family:Cormorant Garamond,serif;color:var(--gold-soft);">' + esc(key) + '</td>';
+        html += '<td>' + typeText + '</td>';
+        html += '<td>' + (code.duration || '-') + '</td>';
+        html += '<td>' + (code.amount || '-') + '</td>';
+        html += '<td class="' + statusClass + '">' + statusText + '</td>';
+        html += '<td>' + esc(usedBy) + '</td>';
+        html += '<td>' + (code.used_at ? new Date(code.used_at).toLocaleDateString('id-ID') : created) + '</td>';
+        html += '<td>';
+        if (!code.used) {
+            html += '<button class="copy-btn" data-code="' + esc(key) + '">📋 Salin</button>';
+        }
+        html += '</td>';
+        html += '</tr>';
+    });
+    
+    if (no === 0) {
+        html = '<tr><td colspan="9" style="text-align:center;color:var(--paper-dim);padding:30px;">Tidak ada data.</td></tr>';
+    }
+    tbody.innerHTML = html;
+    
+    tbody.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const code = this.dataset.code;
+            navigator.clipboard.writeText(code).then(() => {
+                this.textContent = '✅';
+                setTimeout(() => { this.textContent = '📋 Salin'; }, 2000);
+            });
+        });
+    });
+}
+
+// ============================================================
+// RENDER HISTORY
+// ============================================================
+function renderHistory() {
+    const history = DATA.history || {};
+    const search = (document.getElementById('historySearch').value || '').toLowerCase();
+    const tbody = document.getElementById('historyTableBody');
+    
+    let allHistory = [];
+    for (const email in history) {
+        history[email].forEach(item => {
+            allHistory.push({ email: email, ...item });
+        });
+    }
+    allHistory.sort((a, b) => new Date(b.calculated_at) - new Date(a.calculated_at));
+    
+    let html = '';
+    let no = 0;
+    
+    allHistory.forEach(item => {
+        if (search && !item.email.toLowerCase().includes(search) && !(item.name || '').toLowerCase().includes(search)) {
+            return;
+        }
+        no++;
+        const date = new Date(item.calculated_at);
+        const dateStr = date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+        html += '<tr>';
+        html += '<td>' + no + '</td>';
+        html += '<td>' + esc(item.email) + '</td>';
+        html += '<td>' + esc(item.name) + '</td>';
+        html += '<td>' + esc(item.dob) + '</td>';
+        html += '<td>' + dateStr + '</td>';
+        html += '</tr>';
+    });
+    
+    if (no === 0) {
+        html = '<tr><td colspan="5" style="text-align:center;color:var(--paper-dim);padding:30px;">Tidak ada data.</td></tr>';
+    }
+    tbody.innerHTML = html;
+}
+
+// ============================================================
+// EXPORT EXCEL - DAFTAR USER
+// ============================================================
+document.getElementById('exportExcelBtn').addEventListener('click', function() {
+    exportUsersToExcel();
+});
+
+function exportUsersToExcel() {
+    const users = DATA.users || {};
+    const licenses = DATA.licenses || {};
+    
+    let rows = [];
+    let no = 1;
+    
+    rows.push(['No', 'Nama', 'Email', 'No HP', 'Tanggal Registrasi', 'Status Lisensi', 'Sisa Kuota', 'Expired']);
+    
+    for (const email in users) {
+        const user = users[email];
+        let userLicense = null;
+        for (const key in licenses) {
+            if (licenses[key].user_email === email) {
+                userLicense = licenses[key];
+                break;
+            }
+        }
+        
+        let statusText = 'Tidak ada lisensi';
+        let remaining = '-';
+        let expiry = '-';
+        
+        if (userLicense) {
+            if (userLicense.is_active) {
+                const remainingCount = userLicense.quota - userLicense.used_count;
+                const expiryDate = new Date(userLicense.expiry_date);
+                const now = new Date();
+                const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+                
+                if (daysLeft < 0) {
+                    statusText = 'Habis';
+                } else if (daysLeft <= 7) {
+                    statusText = '⚠️ ' + daysLeft + ' hari lagi';
+                } else {
+                    statusText = '✅ Aktif';
+                }
+                remaining = remainingCount + '/' + userLicense.quota;
+                expiry = userLicense.expiry_date || '-';
+            } else {
+                statusText = '❌ Tidak Aktif';
+            }
+        }
+        
+        rows.push([
+            no++,
+            user.name || '-',
+            email,
+            user.phone || '-',
+            user.registered_at ? new Date(user.registered_at).toLocaleDateString('id-ID') : '-',
+            statusText,
+            remaining,
+            expiry
+        ]);
+    }
+    
+    let csvContent = '';
+    rows.forEach(row => {
+        csvContent += row.join(',') + '\n';
+    });
+    
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = 'daftar_user_' + getTodayStr() + '.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    alert('✅ Data user berhasil diexport!');
+}
+
+function getTodayStr() {
+    return new Date().toISOString().slice(0,10);
+}
+
+// ============================================================
+// GENERATE CODES
+// ============================================================
+document.getElementById('generateBtn').addEventListener('click', function() {
+    const type = document.getElementById('genType').value;
+    const count = parseInt(document.getElementById('genCount').value) || 5;
+    const resultEl = document.getElementById('generateResult');
+    
+    let newCodes = [];
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    
+    for (let i = 0; i < count; i++) {
+        const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const key = 'EXTEND-' + date + '-' + random;
+        
+        let codeData = { used: false, used_by: null, used_at: null, created_at: getTodayStr() };
+        
+        if (type === 'time') {
+            codeData.type = 'time';
+            codeData.duration = 30;
+            codeData.amount = null;
+        } else if (type === 'time90') {
+            codeData.type = 'time';
+            codeData.duration = 90;
+            codeData.amount = null;
+        } else if (type === 'quota') {
+            codeData.type = 'quota';
+            codeData.duration = null;
+            codeData.amount = 10;
+        } else if (type === 'both') {
+            codeData.type = 'both';
+            codeData.duration = 30;
+            codeData.amount = 10;
+        }
+        
+        DATA.codes[key] = codeData;
+        newCodes.push(key);
+    }
+    
+    localStorage.setItem('local_codes', JSON.stringify(DATA.codes));
+    
+    resultEl.style.display = 'flex';
+    let html = '';
+    newCodes.forEach(key => {
+        html += '<span class="code-chip">' + esc(key) + ' <button class="copy-btn" data-code="' + esc(key) + '">📋</button></span>';
+    });
+    html += '<span style="color:var(--jade-soft);font-size:12px;margin-left:8px;">✅ ' + count + ' token berhasil dibuat!</span>';
+    resultEl.innerHTML = html;
+    
+    resultEl.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const code = this.dataset.code;
+            navigator.clipboard.writeText(code).then(() => {
+                this.textContent = '✅';
+                setTimeout(() => { this.textContent = '📋'; }, 2000);
+            });
+        });
+    });
+    
+    renderAll();
+});
+
+// ============================================================
+// EXPORT HISTORY
+// ============================================================
+document.getElementById('exportHistoryBtn').addEventListener('click', function() {
+    const history = DATA.history || {};
+    let csv = 'User,Name,DOB,Date\n';
+    for (const email in history) {
+        history[email].forEach(item => {
+            const date = new Date(item.calculated_at);
+            const dateStr = date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+            csv += email + ',' + (item.name || '') + ',' + (item.dob || '') + ',' + dateStr + '\n';
+        });
+    }
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'history_' + getTodayStr() + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+});
+
+// ============================================================
+// HELPER FUNCTIONS
+// ============================================================
+function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function getLicenseByEmail(email) {
+    const licenses = DATA.licenses || {};
+    for (const key in licenses) {
+        if (licenses[key].user_email === email) {
+            return licenses[key];
+        }
+    }
+    return null;
+}
+
+// ============================================================
+// REFRESH BUTTONS
+// ============================================================
+document.getElementById('refreshUsersBtn').addEventListener('click', function() { renderUsers(); });
+document.getElementById('refreshLicensesBtn').addEventListener('click', function() { renderLicenses(); });
+document.getElementById('refreshCodesBtn').addEventListener('click', function() { renderCodes(); });
+document.getElementById('refreshHistoryBtn').addEventListener('click', function() { renderHistory(); });
+
+// Search & Filter
+document.getElementById('userSearch').addEventListener('input', renderUsers);
+document.getElementById('userFilter').addEventListener('change', renderUsers);
+document.getElementById('licenseSearch').addEventListener('input', renderLicenses);
+document.getElementById('codeFilter').addEventListener('change', renderCodes);
+document.getElementById('historySearch').addEventListener('input', renderHistory);
+
+// ============================================================
+// INIT
+// ============================================================
+console.log('🔐 Admin Dashboard siap!');
+console.log('📌 Mode: LOCAL (data dari localStorage)');
+console.log('🔑 PIN: ' + ADMIN_PIN);
+</script>
+</body>
+</html>
