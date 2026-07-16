@@ -1176,7 +1176,10 @@ const CONFIG = {
     GITHUB_TOKEN: '',
     SENDGRID_API_KEY: '',
     MAILTRAP_API_KEY: '',
-    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbydyZej9QAfky9eeCILhCclJzLv41K_rsMoEGk9U7dVettISgBP9TCdMDzsz5JQiX3Hhw/exec',
+    GOOGLE_APPS_SCRIPT_URL: '',
+    EMAILJS_SERVICE_ID: 'service_yiq2t8f',
+    EMAILJS_TEMPLATE_ID: 'template_7aslf4m',
+    EMAILJS_PUBLIC_KEY: 's0RdgWb8Mw4sJzBr4',
     ADMIN_PHONE: '6281944142311',
     ADMIN_EMAIL: 'admin@domain.com',
     DEFAULT_QUOTA: 5,
@@ -1487,44 +1490,20 @@ function sendOTP(email) {
     const otp = generateOTP();
     saveOTP(email, otp);
     
-    // Kirim via Google Apps Script
-    if (!CONFIG.IS_LOCAL && CONFIG.GOOGLE_APPS_SCRIPT_URL) {
-        console.log('📧 Mengirim OTP ke ' + email + ' via Google Apps Script...');
-        console.log('📤 URL:', CONFIG.GOOGLE_APPS_SCRIPT_URL);
+    // Kirim via EmailJS
+    if (!CONFIG.IS_LOCAL && CONFIG.EMAILJS_PUBLIC_KEY) {
+        console.log('📧 Mengirim OTP ke ' + email + ' via EmailJS...');
         
-        // Gunakan mode 'cors' agar bisa melihat response
-        fetch(CONFIG.GOOGLE_APPS_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: email,
-                otp: otp
-            })
-        })
-        .then(response => {
-            console.log('📥 Response status:', response.status);
-            return response.text();
-        })
-        .then(data => {
-            console.log('📥 Response data:', data);
-            try {
-                const json = JSON.parse(data);
-                if (json.success) {
-                    console.log('📧 Email OTP terkirim ke ' + email);
-                    console.log('💡 Cek inbox ' + email + ' (termasuk folder Spam)');
-                } else {
-                    console.log('❌ Gagal kirim email:', json.error);
-                    console.log('📧 [FALLBACK] OTP untuk ' + email + ': ' + otp);
-                }
-            } catch(e) {
-                console.log('📧 [FALLBACK] OTP untuk ' + email + ': ' + otp);
-            }
-        })
-        .catch(error => {
-            console.log('❌ Error:', error);
+        emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
+            user_email: email,
+            otp: otp
+        }, CONFIG.EMAILJS_PUBLIC_KEY)
+        .then(function(response) {
+            console.log('📧 Email OTP terkirim ke ' + email);
+            console.log('💡 Cek inbox ' + email + ' (termasuk folder Spam)');
+            console.log('📥 Response:', response);
+        }, function(error) {
+            console.log('❌ Gagal kirim email:', error);
             console.log('📧 [FALLBACK] OTP untuk ' + email + ': ' + otp);
         });
     } else {
@@ -2755,5 +2734,13 @@ console.log('   - Klik "Lihat" di riwayat → hitung ulang tanpa mengurangi kuot
 
 console.log('✅ Aplikasi siap! Kuota akan muncul dari localStorage.');
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+    (function() {
+        emailjs.init({
+            publicKey: 's0RdgWb8Mw4sJzBr4',
+        });
+    })();
+</script>   
 </body>
 </html>
