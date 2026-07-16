@@ -563,6 +563,22 @@ ul.trait-list li:last-child{border-bottom:none;}
   padding:14px 20px;
   margin-bottom:20px;
 }
+.user-status-bar .login-btn {
+    background: linear-gradient(135deg, var(--jade), #3d705a);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s;
+    font-family: 'Inter', sans-serif;
+}
+.user-status-bar .login-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(79, 138, 114, 0.4);
+}   
 .user-status-bar .status-item{
   display:flex;align-items:center;gap:8px;
   font-size:14px;color:var(--paper-dim);
@@ -739,14 +755,15 @@ ul.trait-list li:last-child{border-bottom:none;}
        ============================================================ -->
   <div id="userStatusBar" style="display:none;" class="user-status-bar">
     <span class="user-name" id="displayName">—</span>
-    <span class="status-item">📊 Kuota: <span class="val success" id="displayKuota">5/5</span></span>
-    <span class="status-item">⏰ Masa Aktif: <span class="val" id="displayMasaAktif">30</span> hari</span>
-    <span class="status-item">📅 Expired: <span class="val" id="displayExpired">2026-08-16</span></span>
+    <span class="status-item" id="kuotaItem">📊 Kuota: <span class="val success" id="displayKuota">5/5</span></span>
+    <span class="status-item" id="masaItem">⏰ Masa Aktif: <span class="val" id="displayMasaAktif">30</span> hari</span>
+    <span class="status-item" id="expiredItem">📅 Expired: <span class="val" id="displayExpired">2026-08-16</span></span>
     <div style="flex:1;"></div>
-    <button class="token-btn" id="historyBtn">📊 Riwayat</button>
-    <button class="token-btn" id="tokenBtn">🔑 Token</button>
-    <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
-  </div>
+    <button class="token-btn" id="historyBtn" style="display:none;">📊 Riwayat</button>
+    <button class="token-btn" id="tokenBtn" style="display:none;">🔑 Token</button>
+    <button class="logout-btn" id="logoutBtn" style="display:none;">🚪 Logout</button>
+    <button class="login-btn" id="loginBtn" style="display:none;">🔐 Login</button>
+</div>
 
   <!-- ============================================================
        LICENSE WARNING
@@ -1593,10 +1610,34 @@ function updateStatusBar() {
     const bar = document.getElementById('userStatusBar');
     const warning = document.getElementById('licenseWarning');
     
+    // Ambil semua elemen
+    const nameEl = document.getElementById('displayName');
+    const kuotaEl = document.getElementById('displayKuota');
+    const masaEl = document.getElementById('displayMasaAktif');
+    const expiredEl = document.getElementById('displayExpired');
+    const kuotaItem = document.getElementById('kuotaItem');
+    const masaItem = document.getElementById('masaItem');
+    const expiredItem = document.getElementById('expiredItem');
+    const historyBtn = document.getElementById('historyBtn');
+    const tokenBtn = document.getElementById('tokenBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    
     if (!session) {
-        bar.style.display = 'none';
+        // BELUM LOGIN
+        bar.style.display = 'flex';
         warning.style.display = 'none';
         document.getElementById('formCard').style.display = 'block';
+        
+        // Sembunyikan data user
+        nameEl.textContent = '👤 Belum Login';
+        kuotaItem.style.display = 'none';
+        masaItem.style.display = 'none';
+        expiredItem.style.display = 'none';
+        historyBtn.style.display = 'none';
+        tokenBtn.style.display = 'none';
+        logoutBtn.style.display = 'none';
+        loginBtn.style.display = 'inline-block';
         return;
     }
     
@@ -1607,46 +1648,35 @@ function updateStatusBar() {
         return;
     }
     
+    // SUDAH LOGIN
     bar.style.display = 'flex';
-    document.getElementById('displayName').textContent = '👤 ' + user.name;
+    nameEl.textContent = '👤 ' + user.name;
+    kuotaItem.style.display = 'flex';
+    masaItem.style.display = 'flex';
+    expiredItem.style.display = 'flex';
+    historyBtn.style.display = 'inline-block';
+    tokenBtn.style.display = 'inline-block';
+    logoutBtn.style.display = 'inline-block';
+    loginBtn.style.display = 'none';
     
-    const kuotaEl = document.getElementById('displayKuota');
-    const masaEl = document.getElementById('displayMasaAktif');
-    const expiredEl = document.getElementById('displayExpired');
+    const license = getLicense(session.email);
     
-    let licenses = {};
-    try {
-        licenses = JSON.parse(localStorage.getItem('local_licenses') || '{}');
-    } catch(e) {}
-    
-    let userLicense = null;
-    for (const key in licenses) {
-        if (licenses[key].user_email === session.email) {
-            userLicense = licenses[key];
-            break;
-        }
-    }
-    
-    if (userLicense && userLicense.is_active) {
-        const remaining = userLicense.quota - (userLicense.used_count || 0);
-        const expiry = new Date(userLicense.expiry_date);
+    if (license && license.is_active) {
+        const remaining = license.quota - (license.used_count || 0);
+        const expiry = new Date(license.expiry_date);
         const now = new Date();
         const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
         
         if (kuotaEl) {
-            kuotaEl.textContent = remaining + '/' + userLicense.quota;
+            kuotaEl.textContent = remaining + '/' + license.quota;
             kuotaEl.className = 'val success';
-            kuotaEl.style.color = '#7fb59c';
-            kuotaEl.style.fontWeight = 'bold';
-            kuotaEl.style.fontSize = '16px';
-            kuotaEl.style.display = 'inline-block';
         }
         if (masaEl) {
             masaEl.textContent = daysLeft > 0 ? daysLeft : 0;
             masaEl.className = 'val';
         }
         if (expiredEl) {
-            expiredEl.textContent = userLicense.expiry_date;
+            expiredEl.textContent = license.expiry_date;
             expiredEl.className = 'val';
         }
         
@@ -1666,7 +1696,7 @@ function updateStatusBar() {
             expiredEl.className = 'val danger';
         }
         
-        if (userLicense && !userLicense.is_active) {
+        if (license && !license.is_active) {
             warning.style.display = 'block';
             document.getElementById('licenseWarningDesc').textContent = 'Lisensi Anda tidak aktif. Hubungi admin untuk perpanjang.';
             document.getElementById('waLink').href = getWALink(session.email);
@@ -1991,6 +2021,10 @@ document.getElementById('tokenBtn').addEventListener('click', function() {
     }
     showModal('token');
 });
+   // Tombol Login (untuk user yang belum login)
+document.getElementById('loginBtn').addEventListener('click', function() {
+    showModal('login');
+});
 
 // ============================================================
 // RIWAYAT - TANPA PENGECEKAN LISENSI
@@ -2089,10 +2123,14 @@ document.getElementById('quotaModal').addEventListener('click', function(e) {
 
 function loadHistory() {
     const session = getSession();
-    if (!session) return;
+    const container = document.getElementById('historyContent');
+    
+    if (!session) {
+        container.innerHTML = '<div class="history-empty-state">🔐 Silakan login terlebih dahulu untuk melihat riwayat.</div>';
+        return;
+    }
     
     const history = getUserHistory(session.email);
-    const container = document.getElementById('historyContent');
     
     if (history.length === 0) {
         container.innerHTML = '<div class="history-empty-state">📭 Belum ada riwayat perhitungan.</div>';
@@ -2141,7 +2179,6 @@ function loadHistory() {
         });
     });
 }
-
 function calculateWithoutQuota() {
     var name = document.getElementById('fname').value.trim();
     var day = document.getElementById('dobDay').value.trim();
