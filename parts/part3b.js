@@ -112,11 +112,37 @@ function verifyOTP(email, code) {
 function sendOTP(email) {
     const otp = generateOTP();
     saveOTP(email, otp);
-    console.log('📧 [LOCAL] OTP untuk ' + email + ': ' + otp);
-    console.log('💡 Gunakan kode ini untuk verifikasi (mode lokal)');
+    
+    // Kirim via Google Apps Script
+    if (!CONFIG.IS_LOCAL && CONFIG.GOOGLE_APPS_SCRIPT_URL) {
+        console.log('📧 Mengirim OTP ke ' + email + ' via Google Apps Script...');
+        
+        fetch(CONFIG.GOOGLE_APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                otp: otp
+            })
+        })
+        .then(() => {
+            console.log('📧 Email OTP terkirim ke ' + email);
+            console.log('💡 Cek inbox ' + email + ' (termasuk folder Spam)');
+        })
+        .catch(error => {
+            console.log('❌ Gagal kirim email:', error);
+            console.log('📧 [FALLBACK] OTP untuk ' + email + ': ' + otp);
+        });
+    } else {
+        console.log('📧 [LOCAL] OTP untuk ' + email + ': ' + otp);
+        console.log('💡 Gunakan kode ini untuk verifikasi (mode lokal)');
+    }
+    
     return true;
 }
-
 // ============================================================
 // WHATSAPP LINK
 // ============================================================
