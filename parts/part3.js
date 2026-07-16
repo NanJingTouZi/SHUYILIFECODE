@@ -189,17 +189,18 @@ const RELATION_DATA = [
 // CONFIGURATION
 // ============================================================
 const CONFIG = {
-    IS_LOCAL: true,
-    GITHUB_RAW_URL: 'https://raw.githubusercontent.com/username/repo/main/data/',
-    GITHUB_API_URL: 'https://api.github.com/repos/username/repo/contents/data/',
+    IS_LOCAL: false,
+    GITHUB_RAW_URL: 'https://raw.githubusercontent.com/nanjingtouzi/SHUYILIFECODE/main/data/',
+    GITHUB_API_URL: 'https://api.github.com/repos/nanjingtouzi/SHUYILIFECODE/contents/data/',
     GITHUB_TOKEN: '',
     SENDGRID_API_KEY: '',
-    ADMIN_PHONE: '6281944142311',  // ← GANTI DENGAN NOMOR ADMIN ANDA
+    MAILTRAP_API_KEY: '',
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbydyZej9QAfky9eeCILhCclJzLv41K_rsMoEGk9U7dVettISgBP9TCdMDzsz5JQiX3Hhw/exec',
+    ADMIN_PHONE: '6281944142311',
     ADMIN_EMAIL: 'admin@domain.com',
     DEFAULT_QUOTA: 5,
     DEFAULT_DAYS: 30
 };
-
 // ============================================================
 // DATA STORE
 // ============================================================
@@ -504,11 +505,37 @@ function verifyOTP(email, code) {
 function sendOTP(email) {
     const otp = generateOTP();
     saveOTP(email, otp);
-    console.log('📧 [LOCAL] OTP untuk ' + email + ': ' + otp);
-    console.log('💡 Gunakan kode ini untuk verifikasi (mode lokal)');
+    
+    // Kirim via Google Apps Script
+    if (!CONFIG.IS_LOCAL && CONFIG.GOOGLE_APPS_SCRIPT_URL) {
+        console.log('📧 Mengirim OTP ke ' + email + ' via Google Apps Script...');
+        
+        fetch(CONFIG.GOOGLE_APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                otp: otp
+            })
+        })
+        .then(() => {
+            console.log('📧 Email OTP terkirim ke ' + email);
+            console.log('💡 Cek inbox ' + email + ' (termasuk folder Spam)');
+        })
+        .catch(error => {
+            console.log('❌ Gagal kirim email:', error);
+            console.log('📧 [FALLBACK] OTP untuk ' + email + ': ' + otp);
+        });
+    } else {
+        console.log('📧 [LOCAL] OTP untuk ' + email + ': ' + otp);
+        console.log('💡 Gunakan kode ini untuk verifikasi (mode lokal)');
+    }
+    
     return true;
 }
-
 // ============================================================
 // WHATSAPP LINK
 // ============================================================
