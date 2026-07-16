@@ -753,15 +753,15 @@ ul.trait-list li:last-child{border-bottom:none;}
   <!-- ============================================================
        USER STATUS BAR
        ============================================================ -->
-  <div id="userStatusBar" style="display:none;" class="user-status-bar">
+  <<div id="userStatusBar" style="display:none;" class="user-status-bar">
     <span class="user-name" id="displayName">—</span>
     <span class="status-item" id="kuotaItem">📊 Kuota: <span class="val success" id="displayKuota">5/5</span></span>
     <span class="status-item" id="masaItem">⏰ Masa Aktif: <span class="val" id="displayMasaAktif">30</span> hari</span>
     <span class="status-item" id="expiredItem">📅 Expired: <span class="val" id="displayExpired">2026-08-16</span></span>
     <div style="flex:1;"></div>
-    <button class="token-btn" id="historyBtn" style="display:none;">📊 Riwayat</button>
-    <button class="token-btn" id="tokenBtn" style="display:none;">🔑 Token</button>
-    <button class="logout-btn" id="logoutBtn" style="display:none;">🚪 Logout</button>
+    <button class="token-btn" id="historyBtn">📊 Riwayat</button>
+    <button class="token-btn" id="tokenBtn">🔑 Token</button>
+    <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
     <button class="login-btn" id="loginBtn" style="display:none;">🔐 Login</button>
 </div>
 
@@ -1612,7 +1612,7 @@ function updateStatusBar() {
         return;
     }
     
-    // SUDAH LOGIN
+    // SUDAH LOGIN - TAMPILKAN SEMUA
     bar.style.display = 'flex';
     if (nameEl) nameEl.textContent = '👤 ' + user.name;
     if (kuotaItem) kuotaItem.style.display = 'flex';
