@@ -1,0 +1,116 @@
+name: API Server
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Create API endpoint
+        run: |
+          mkdir -p api
+          cat > api/data.js << 'EOF'
+          // API endpoint untuk baca/tulis data
+          export default async function handler(req, res) {
+            // CORS headers
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+            res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+            
+            if (req.method === 'OPTIONS') {
+              return res.status(200).end();
+            }
+            
+            const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+            const GITHUB_OWNER = 'nanjingtouzi';
+            const GITHUB_REPO = 'SHUYILIFECODE';
+            const DATA_FILE = 'data.json';
+            const BRANCH = 'main';
+            
+            const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${DATA_FILE}`;
+            
+            try {
+              // GET - Baca data
+              if (req.method === 'GET') {
+                const response = await fetch(apiUrl, {
+                  headers: {
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Authorization': `token ${GITHUB_TOKEN}`
+                  }
+                });
+                
+                if (response.status === 404) {
+                  return res.status(200).json({ users: {}, licenses: {}, codes: {}, history: {} });
+                }
+                
+                const data = await response.json();
+                const content = Buffer.from(data.content, 'base64').toString('utf8');
+                return res.status(200).json(JSON.parse(content));
+              }
+              
+              // POST/PUT - Tulis data
+              if (req.method === 'POST' || req.method === 'PUT') {
+                const body = req.body;
+                const content = Buffer.from(JSON.stringify(body, null, 2)).toString('base64');
+                
+                // Get SHA
+                let sha = null;
+                const shaResponse = await fetch(apiUrl, {
+                  headers: {
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Authorization': `token ${GITHUB_TOKEN}`
+                  }
+                });
+                if (shaResponse.ok) {
+                  const fileInfo = await shaResponse.json();
+                  sha = fileInfo.sha;
+                }
+                
+                // Commit
+                const commitResponse = await fetch(apiUrl, {
+                  method: 'PUT',
+                  headers: {
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    message: `Update data ${new Date().toISOString()}`,
+                    content: content,
+                    sha: sha || undefined,
+                    branch: BRANCH
+                  })
+                });
+                
+                if (!commitResponse.ok) {
+                  throw new Error(`GitHub API error: ${commitResponse.status}`);
+                }
+                
+                return res.status(200).json({ success: true, message: 'Data saved' });
+              }
+              
+              return res.status(405).json({ error: 'Method not allowed' });
+            } catch (error) {
+              console.error('API Error:', error);
+              return res.status(500).json({ error: error.message });
+            }
+          }
+          EOF
+          
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages
+          keep_files: true
