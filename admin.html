@@ -490,181 +490,148 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 
 </div>
 
-<script>
+<!-- ============================================================
+   JAVASCRIPT - FIREBASE
+   ============================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"
+  }
+}
+</script>
+
+<script type="module">
+import { initializeApp } from 'firebase/app';
+import { 
+  getAuth, 
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from 'firebase/auth';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  addDoc,
+  deleteDoc as deleteFirestoreDoc
+} from 'firebase/firestore';
+
 // ============================================================
-// KONFIGURASI
+// FIREBASE CONFIG - GANTI DENGAN MILIK ANDA!
 // ============================================================
-const CONFIG = {
-    GITHUB_TOKEN: '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',
-    GITHUB_OWNER: 'nanjingtouzi',
-    GITHUB_REPO: 'SHUYILIFECODE',
-    GITHUB_BRANCH: 'main',
-    DATA_FILE: 'data.json',
-    ADMIN_PIN: '123456'
+const firebaseConfig = {
+  apiKey: "AIzaSyDX9Rm_Wz8Ge2AiYvTMBQ4VbyQu6zI2esI",
+  authDomain: "shuyi-lifecode.firebaseapp.com",
+  projectId: "shuyi-lifecode",
+  storageBucket: "shuyi-lifecode.firebasestorage.app",
+  messagingSenderId: "386576582379",
+  appId: "1:386576582379:web:aa54c278e314361c1ee0ae",
+  measurementId: "G-CXEHC5EEMG"
 };
 
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
 // ============================================================
-// GITHUB DATA MANAGER - VERSI SIMPLE (TANPA CORS)
+// CONFIG
 // ============================================================
-class GitHubDataManager {
-    constructor() {
-        this.cache = null;
-        this.lastFetch = 0;
-        this.cacheTTL = 5000;
+const ADMIN_PIN = '123456';
+
+// ============================================================
+// DATA FUNCTIONS
+// ============================================================
+async function getAllUsers() {
+    const querySnapshot = await getDocs(collection(db, 'users'));
+    const users = {};
+    querySnapshot.forEach((doc) => {
+        users[doc.id] = doc.data();
+    });
+    return users;
+}
+
+async function getAllLicenses() {
+    const querySnapshot = await getDocs(collection(db, 'licenses'));
+    const licenses = {};
+    querySnapshot.forEach((doc) => {
+        licenses[doc.id] = doc.data();
+    });
+    return licenses;
+}
+
+async function getAllCodes() {
+    const querySnapshot = await getDocs(collection(db, 'codes'));
+    const codes = {};
+    querySnapshot.forEach((doc) => {
+        codes[doc.id] = doc.data();
+    });
+    return codes;
+}
+
+async function getAllHistory() {
+    const querySnapshot = await getDocs(collection(db, 'history'));
+    const history = [];
+    querySnapshot.forEach((doc) => {
+        history.push({ id: doc.id, ...doc.data() });
+    });
+    return history.sort((a, b) => new Date(b.calculated_at) - new Date(a.calculated_at));
+}
+
+async function generateTokens(pin, type, count) {
+    if (pin !== ADMIN_PIN) {
+        return { success: false, message: 'PIN salah' };
     }
 
-    // Gunakan GitHub API (bukan raw) untuk menghindari CORS
-    get apiUrl() {
-        return `https://api.github.com/repos/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/contents/${CONFIG.DATA_FILE}`;
-    }
-
-    async read() {
-        // Gunakan cache
-        if (this.cache && (Date.now() - this.lastFetch < this.cacheTTL)) {
-            return this.cache;
-        }
-
-        try {
-            console.log('📖 Membaca data dari GitHub API...');
-            
-            const response = await fetch(this.apiUrl, {
-                headers: {
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Authorization': `token ${CONFIG.GITHUB_TOKEN}`
-                }
-            });
-
-            if (response.status === 404) {
-                console.log('📄 File data.json belum ada, akan dibuat baru');
-                const emptyData = { users: {}, licenses: {}, codes: {}, history: {} };
-                this.cache = emptyData;
-                this.lastFetch = Date.now();
-                return emptyData;
-            }
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ GitHub API Error:', response.status, errorText);
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const fileData = await response.json();
-            // Decode base64 content
-            const content = atob(fileData.content);
-            const data = JSON.parse(content);
-            
-            this.cache = data;
-            this.lastFetch = Date.now();
-            console.log('✅ Data berhasil dibaca dari GitHub');
-            return data;
-        } catch (error) {
-            console.error('❌ Gagal baca dari GitHub:', error);
-            if (this.cache) return this.cache;
-            return { users: {}, licenses: {}, codes: {}, history: {} };
-        }
-    }
-
-    async write(data) {
-        try {
-            console.log('📝 Menyimpan data ke GitHub...');
-
-            // 1. Cek SHA file
-            let sha = null;
-            try {
-                const response = await fetch(this.apiUrl, {
-                    headers: {
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Authorization': `token ${CONFIG.GITHUB_TOKEN}`
-                    }
-                });
-                if (response.ok) {
-                    const fileInfo = await response.json();
-                    sha = fileInfo.sha;
-                    console.log('📄 SHA ditemukan:', sha);
-                } else if (response.status === 404) {
-                    console.log('📄 File baru akan dibuat');
-                } else {
-                    const errorText = await response.text();
-                    console.error('❌ Error get SHA:', response.status, errorText);
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-            } catch (e) {
-                console.log('📄 File belum ada atau error, akan dibuat baru');
-            }
-
-            // 2. Encode ke base64
-            const jsonString = JSON.stringify(data, null, 2);
-            const content = btoa(unescape(encodeURIComponent(jsonString)));
-
-            // 3. Commit ke GitHub
-            const commitResponse = await fetch(this.apiUrl, {
-                method: 'PUT',
-                headers: {
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Authorization': `token ${CONFIG.GITHUB_TOKEN}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `Admin update data ${new Date().toISOString()}`,
-                    content: content,
-                    sha: sha || undefined,
-                    branch: CONFIG.GITHUB_BRANCH
-                })
-            });
-
-            if (!commitResponse.ok) {
-                const errorData = await commitResponse.json();
-                console.error('❌ Commit error:', errorData);
-                throw new Error(`HTTP ${commitResponse.status}: ${errorData.message || commitResponse.statusText}`);
-            }
-
-            this.cache = data;
-            this.lastFetch = Date.now();
-            console.log('✅ Data berhasil disimpan ke GitHub');
-            return true;
-        } catch (error) {
-            console.error('❌ Gagal simpan ke GitHub:', error);
-            throw error;
-        }
-    }
-
-    async addCode(token, type, amount, duration) {
-        console.log('🔑 Menambahkan token:', token);
-        const data = await this.read();
+    const tokens = [];
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    
+    for (let i = 0; i < count; i++) {
+        const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const key = 'EXTEND-' + date + '-' + random;
         
-        data.codes[token] = {
+        let amount = null, duration = null;
+        if (type === 'time') duration = 30;
+        else if (type === 'time90') duration = 90;
+        else if (type === 'quota') amount = 10;
+        else if (type === 'both') { duration = 30; amount = 10; }
+        
+        await setDoc(doc(db, 'codes', key), {
             type: type,
-            amount: amount || null,
-            duration: duration || null,
+            amount: amount,
+            duration: duration,
             used: false,
             used_by: null,
             used_at: null,
             created_at: new Date().toISOString()
-        };
-        
-        await this.write(data);
-        console.log('✅ Token berhasil ditambahkan:', token);
-        return true;
+        });
+        tokens.push(key);
     }
+    
+    return { success: true, tokens: tokens };
 }
-
-// ============================================================
-// INSTANCE
-// ============================================================
-const db = new GitHubDataManager();
-let DATA = { users: {}, licenses: {}, codes: {}, history: {} };
 
 // ============================================================
 // PIN LOGIN
 // ============================================================
-document.getElementById('pinSubmitBtn').addEventListener('click', async function() {
+document.getElementById('pinSubmitBtn').addEventListener('click', function() {
     const pin = document.getElementById('pinInput').value;
     const errEl = document.getElementById('pinErr');
     
-    if (pin === CONFIG.ADMIN_PIN) {
+    if (pin === ADMIN_PIN) {
         document.getElementById('pinOverlay').classList.add('hidden');
         document.getElementById('dashboardWrap').style.display = 'block';
-        await loadData();
+        loadData();
         renderAll();
         updateClock();
         setInterval(updateClock, 60000);
@@ -681,20 +648,6 @@ document.getElementById('pinInput').addEventListener('keydown', function(e) {
         document.getElementById('pinSubmitBtn').click();
     }
 });
-
-// ============================================================
-// LOAD DATA
-// ============================================================
-async function loadData() {
-    try {
-        DATA = await db.read();
-        console.log('✅ Data loaded, users:', Object.keys(DATA.users).length);
-        return true;
-    } catch (error) {
-        console.error('❌ Gagal load data:', error);
-        return false;
-    }
-}
 
 // ============================================================
 // CLOCK
@@ -729,6 +682,28 @@ document.querySelectorAll('.tab').forEach(tab => {
 });
 
 // ============================================================
+// DATA STORE
+// ============================================================
+let DATA = { users: {}, licenses: {}, codes: {}, history: [] };
+
+// ============================================================
+// LOAD DATA
+// ============================================================
+async function loadData() {
+    try {
+        DATA.users = await getAllUsers();
+        DATA.licenses = await getAllLicenses();
+        DATA.codes = await getAllCodes();
+        DATA.history = await getAllHistory();
+        console.log('✅ Data loaded from Firebase');
+        return true;
+    } catch (error) {
+        console.error('❌ Gagal load data:', error);
+        return false;
+    }
+}
+
+// ============================================================
 // RENDER FUNCTIONS
 // ============================================================
 function renderAll() {
@@ -743,14 +718,13 @@ function renderStats() {
     const users = DATA.users || {};
     const licenses = DATA.licenses || {};
     const codes = DATA.codes || {};
-    const history = DATA.history || {};
+    const history = DATA.history || [];
     
     const total = Object.keys(users).length;
     let active = 0, expired = 0, warning = 0;
-    let totalHistory = 0;
     
-    for (const key in licenses) {
-        const lic = licenses[key];
+    for (const email in licenses) {
+        const lic = licenses[email];
         if (!lic.is_active) {
             expired++;
         } else {
@@ -764,10 +738,6 @@ function renderStats() {
         }
     }
     
-    for (const email in history) {
-        totalHistory += history[email].length;
-    }
-    
     const availableCodes = Object.keys(codes).filter(key => !codes[key].used).length;
     
     document.getElementById('statTotal').textContent = total;
@@ -775,11 +745,12 @@ function renderStats() {
     document.getElementById('statExpired').textContent = expired;
     document.getElementById('statWarning').textContent = warning;
     document.getElementById('statCodes').textContent = availableCodes;
-    document.getElementById('statHistory').textContent = totalHistory;
+    document.getElementById('statHistory').textContent = history.length;
 }
 
 function renderUsers() {
     const users = DATA.users || {};
+    const licenses = DATA.licenses || {};
     const search = (document.getElementById('userSearch').value || '').toLowerCase();
     const filter = document.getElementById('userFilter').value;
     const tbody = document.getElementById('usersTableBody');
@@ -790,7 +761,7 @@ function renderUsers() {
     
     emails.forEach(email => {
         const user = users[email];
-        const lic = getLicenseByEmail(email);
+        const lic = licenses[email] || null;
         
         if (search && !email.toLowerCase().includes(search) && !(user.name || '').toLowerCase().includes(search)) {
             return;
@@ -853,13 +824,13 @@ function renderLicenses() {
     const search = (document.getElementById('licenseSearch').value || '').toLowerCase();
     const tbody = document.getElementById('licensesTableBody');
     
-    let keys = Object.keys(licenses);
+    let emails = Object.keys(licenses);
     let html = '';
     let no = 0;
     
-    keys.forEach(key => {
-        const lic = licenses[key];
-        if (search && !lic.user_email.toLowerCase().includes(search)) return;
+    emails.forEach(email => {
+        const lic = licenses[email];
+        if (search && !email.toLowerCase().includes(search)) return;
         
         no++;
         const remaining = lic.quota - lic.used_count;
@@ -881,8 +852,8 @@ function renderLicenses() {
         
         html += '<tr>';
         html += '<td>' + no + '</td>';
-        html += '<td>' + esc(lic.user_email) + '</td>';
-        html += '<td style="font-family:Cormorant Garamond,serif;color:var(--gold-soft);">' + esc(key) + '</td>';
+        html += '<td>' + esc(email) + '</td>';
+        html += '<td style="font-family:Cormorant Garamond,serif;color:var(--gold-soft);">' + esc(lic.key || '-') + '</td>';
         html += '<td>' + lic.quota + '</td>';
         html += '<td>' + lic.used_count + '</td>';
         html += '<td>' + remaining + '</td>';
@@ -957,22 +928,14 @@ function renderCodes() {
 }
 
 function renderHistory() {
-    const history = DATA.history || {};
+    const history = DATA.history || [];
     const search = (document.getElementById('historySearch').value || '').toLowerCase();
     const tbody = document.getElementById('historyTableBody');
-    
-    let allHistory = [];
-    for (const email in history) {
-        history[email].forEach(item => {
-            allHistory.push({ email: email, ...item });
-        });
-    }
-    allHistory.sort((a, b) => new Date(b.calculated_at) - new Date(a.calculated_at));
     
     let html = '';
     let no = 0;
     
-    allHistory.forEach(item => {
+    history.forEach(item => {
         if (search && !item.email.toLowerCase().includes(search) && !(item.name || '').toLowerCase().includes(search)) {
             return;
         }
@@ -1008,30 +971,20 @@ document.getElementById('generateBtn').addEventListener('click', async function(
     resultEl.style.display = 'none';
     
     try {
-        console.log('🚀 Generate ' + count + ' token, type:', type);
+        const pin = prompt('Masukkan PIN Admin:');
+        if (!pin) {
+            btn.disabled = false;
+            btn.textContent = '🚀 Generate Token';
+            return;
+        }
         
-        let newCodes = [];
-        const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        const result = await generateTokens(pin, type, count);
         
-        for (let i = 0; i < count; i++) {
-            const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-            const key = 'EXTEND-' + date + '-' + random;
-            
-            let amount = null, duration = null;
-            
-            if (type === 'time') {
-                duration = 30;
-            } else if (type === 'time90') {
-                duration = 90;
-            } else if (type === 'quota') {
-                amount = 10;
-            } else if (type === 'both') {
-                duration = 30;
-                amount = 10;
-            }
-            
-            await db.addCode(key, type, amount, duration);
-            newCodes.push(key);
+        if (!result.success) {
+            alert('❌ ' + result.message);
+            btn.disabled = false;
+            btn.textContent = '🚀 Generate Token';
+            return;
         }
         
         // Reload data
@@ -1040,10 +993,10 @@ document.getElementById('generateBtn').addEventListener('click', async function(
         
         resultEl.style.display = 'flex';
         let html = '';
-        newCodes.forEach(key => {
+        result.tokens.forEach(key => {
             html += '<span class="code-chip">' + esc(key) + ' <button class="copy-btn" data-code="' + esc(key) + '">📋</button></span>';
         });
-        html += '<span style="color:var(--jade-soft);font-size:12px;margin-left:8px;">✅ ' + count + ' token berhasil dibuat di GitHub!</span>';
+        html += '<span style="color:var(--jade-soft);font-size:12px;margin-left:8px;">✅ ' + count + ' token berhasil dibuat di Firebase!</span>';
         resultEl.innerHTML = html;
         
         resultEl.querySelectorAll('.copy-btn').forEach(btn => {
@@ -1056,7 +1009,7 @@ document.getElementById('generateBtn').addEventListener('click', async function(
             });
         });
         
-        alert('✅ ' + count + ' token berhasil dibuat dan disimpan di GitHub!');
+        alert('✅ ' + count + ' token berhasil dibuat!');
         
     } catch (error) {
         console.error('❌ Gagal membuat token:', error);
@@ -1079,22 +1032,16 @@ document.getElementById('exportExcelBtn').addEventListener('click', function() {
     
     for (const email in users) {
         const user = users[email];
-        let userLicense = null;
-        for (const key in licenses) {
-            if (licenses[key].user_email === email) {
-                userLicense = licenses[key];
-                break;
-            }
-        }
+        const lic = licenses[email] || null;
         
         let statusText = 'Tidak ada lisensi';
         let remaining = '-';
         let expiry = '-';
         
-        if (userLicense) {
-            if (userLicense.is_active) {
-                const remainingCount = userLicense.quota - userLicense.used_count;
-                const expiryDate = new Date(userLicense.expiry_date);
+        if (lic) {
+            if (lic.is_active) {
+                const remainingCount = lic.quota - lic.used_count;
+                const expiryDate = new Date(lic.expiry_date);
                 const now = new Date();
                 const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
                 
@@ -1105,8 +1052,8 @@ document.getElementById('exportExcelBtn').addEventListener('click', function() {
                 } else {
                     statusText = '✅ Aktif';
                 }
-                remaining = remainingCount + '/' + userLicense.quota;
-                expiry = userLicense.expiry_date || '-';
+                remaining = remainingCount + '/' + lic.quota;
+                expiry = lic.expiry_date || '-';
             } else {
                 statusText = '❌ Tidak Aktif';
             }
@@ -1143,15 +1090,13 @@ document.getElementById('exportExcelBtn').addEventListener('click', function() {
 });
 
 document.getElementById('exportHistoryBtn').addEventListener('click', function() {
-    const history = DATA.history || {};
+    const history = DATA.history || [];
     let csv = 'User,Name,DOB,Date\n';
-    for (const email in history) {
-        history[email].forEach(item => {
-            const date = new Date(item.calculated_at);
-            const dateStr = date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
-            csv += email + ',' + (item.name || '') + ',' + (item.dob || '') + ',' + dateStr + '\n';
-        });
-    }
+    history.forEach(item => {
+        const date = new Date(item.calculated_at);
+        const dateStr = date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+        csv += (item.email || '') + ',' + (item.name || '') + ',' + (item.dob || '') + ',' + dateStr + '\n';
+    });
     
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -1167,16 +1112,6 @@ document.getElementById('exportHistoryBtn').addEventListener('click', function()
 // ============================================================
 function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function getTodayStr() { return new Date().toISOString().slice(0,10); }
-
-function getLicenseByEmail(email) {
-    const licenses = DATA.licenses || {};
-    for (const key in licenses) {
-        if (licenses[key].user_email === email) {
-            return licenses[key];
-        }
-    }
-    return null;
-}
 
 // ============================================================
 // REFRESH BUTTONS
@@ -1206,12 +1141,20 @@ document.getElementById('codeFilter').addEventListener('change', renderCodes);
 document.getElementById('historySearch').addEventListener('input', renderHistory);
 
 // ============================================================
+// AUTH STATE OBSERVER (untuk admin login)
+// ============================================================
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log('✅ Admin logged in:', user.email);
+    }
+});
+
+// ============================================================
 // INIT
 // ============================================================
 console.log('🔐 Admin Dashboard siap!');
-console.log('📌 Mode: GITHUB API');
-console.log('📌 Repository: ' + CONFIG.GITHUB_OWNER + '/' + CONFIG.GITHUB_REPO);
-console.log('🔑 PIN: ' + CONFIG.ADMIN_PIN);
+console.log('📌 Mode: FIREBASE');
+console.log('🔑 PIN: ' + ADMIN_PIN);
 </script>
 </body>
 </html>
