@@ -1173,7 +1173,7 @@ const CONFIG = {
     IS_LOCAL: false,
     GITHUB_RAW_URL: 'https://raw.githubusercontent.com/nanjingtouzi/SHUYILIFECODE/main/data/',
     GITHUB_API_URL: 'https://api.github.com/repos/nanjingtouzi/SHUYILIFECODE/contents/data/',
-    GITHUB_TOKEN: '',
+    GITHUB_TOKEN: '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',
     SENDGRID_API_KEY: '',
     MAILTRAP_API_KEY: '',
     GOOGLE_APPS_SCRIPT_URL: '',
@@ -1346,34 +1346,97 @@ function getLicenseStatus(email) {
 function getCodes() { return DATA.codes; }
 
 function redeemToken(email, token) {
-    const codeData = DATA.codes[token];
-    if (!codeData) return { success: false, message: 'Token tidak ditemukan.' };
-    if (codeData.used) return { success: false, message: 'Token sudah digunakan.' };
-    
-    codeData.used = true;
-    codeData.used_by = email;
-    codeData.used_at = getNowISO();
-    saveLocalData();
-    
-    const license = getLicense(email);
-    if (!license) return { success: false, message: 'Lisensi tidak ditemukan.' };
-    
-    if (codeData.type === 'time') {
-        const currentExpiry = new Date(license.expiry_date);
-        currentExpiry.setDate(currentExpiry.getDate() + codeData.duration);
-        license.expiry_date = currentExpiry.toISOString().slice(0,10);
-    } else if (codeData.type === 'quota') {
-        license.quota += codeData.amount;
-    } else if (codeData.type === 'both') {
-        const currentExpiry = new Date(license.expiry_date);
-        currentExpiry.setDate(currentExpiry.getDate() + codeData.duration);
-        license.expiry_date = currentExpiry.toISOString().slice(0,10);
-        license.quota += codeData.amount;
-    }
-    
-    license.is_active = true;
-    saveLocalData();
-    return { success: true, message: 'Lisensi berhasil diperpanjang!' };
+    return new Promise(function(resolve, reject) {
+        // 1. Ambil data codes dari GitHub
+        fetch(CONFIG.GITHUB_RAW_URL + 'codes.json')
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data token dari GitHub');
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                var codes = data.codes || {};
+                var codeData = codes[token];
+                
+                if (!codeData) {
+                    resolve({ success: false, message: 'Token tidak ditemukan.' });
+                    return;
+                }
+                if (codeData.used) {
+                    resolve({ success: false, message: 'Token sudah digunakan.' });
+                    return;
+                }
+                
+                // Tandai token terpakai
+                codeData.used = true;
+                codeData.used_by = email;
+                codeData.used_at = new Date().toISOString();
+                
+                // 2. Update ke GitHub
+                var updatedContent = JSON.stringify({ codes: codes }, null, 2);
+                
+                return fetch(CONFIG.GITHUB_API_URL + 'codes.json', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'token ' + CONFIG.GITHUB_TOKEN,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Redeem token: ' + token + ' by ' + email,
+                        content: btoa(unescape(encodeURIComponent(updatedContent))),
+                        sha: data.sha || ''
+                    })
+                });
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Gagal update token di GitHub: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(function() {
+                // 3. Update lisensi user (tambah kuota)
+                var licenses = JSON.parse(localStorage.getItem('local_licenses') || '{}');
+                var userLicense = null;
+                for (var key in licenses) {
+                    if (licenses[key].user_email === email) {
+                        userLicense = licenses[key];
+                        break;
+                    }
+                }
+                
+                if (userLicense) {
+                    // Cari data token untuk mengetahui jenis perpanjangan
+                    fetch(CONFIG.GITHUB_RAW_URL + 'codes.json')
+                        .then(function(res) { return res.json(); })
+                        .then(function(data) {
+                            var codeData = data.codes[token];
+                            if (codeData.type === 'quota') {
+                                userLicense.quota += codeData.amount || 10;
+                            } else if (codeData.type === 'time') {
+                                var currentExpiry = new Date(userLicense.expiry_date);
+                                currentExpiry.setDate(currentExpiry.getDate() + (codeData.duration || 30));
+                                userLicense.expiry_date = currentExpiry.toISOString().slice(0, 10);
+                            } else if (codeData.type === 'both') {
+                                userLicense.quota += codeData.amount || 10;
+                                var currentExpiry2 = new Date(userLicense.expiry_date);
+                                currentExpiry2.setDate(currentExpiry2.getDate() + (codeData.duration || 30));
+                                userLicense.expiry_date = currentExpiry2.toISOString().slice(0, 10);
+                            }
+                            userLicense.is_active = true;
+                            localStorage.setItem('local_licenses', JSON.stringify(licenses));
+                            
+                            resolve({ success: true, message: 'Lisensi berhasil diperpanjang!' });
+                        });
+                } else {
+                    resolve({ success: false, message: 'Lisensi tidak ditemukan.' });
+                }
+            })
+            .catch(function(error) {
+                resolve({ success: false, message: 'Error: ' + error.message });
+            });
+    });
 }
 // ============================================================
 // HISTORY FUNCTIONS
