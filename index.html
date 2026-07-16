@@ -84,7 +84,7 @@ label{
   display:block;font-size:12.5px;letter-spacing:0.08em;text-transform:uppercase;
   color:var(--gold-soft);margin-bottom:8px;font-weight:600;
 }
-input[type="text"], input[type="email"], input[type="tel"]{
+input[type="text"], input[type="email"], input[type="password"], input[type="tel"]{
   width:100%;padding:13px 14px;border-radius:10px;
   border:1px solid rgba(201,162,74,0.3);
   background:rgba(0,0,0,0.25);
@@ -786,65 +786,51 @@ ul.trait-list li:last-child{border-bottom:none;}
 </div>
 
 <!-- ============================================================
-   BAGIAN 2: MODAL HTML (SAMA PERSIS)
+   BAGIAN 2: MODAL HTML
    ============================================================ -->
 <!-- Modal Login -->
 <div class="modal-overlay" id="loginModal">
   <div class="modal-box" id="loginModalBox">
     <div class="modal-icon" id="modalIcon">🔐</div>
-    <h2 id="modalTitle">Login untuk Menghitung</h2>
-    <p id="modalSub">Masukkan email Anda untuk melanjutkan.</p>
+    <h2 id="modalTitle">Login</h2>
+    <p id="modalSub">Masukkan email dan password Anda.</p>
 
-    <!-- Step 1: Input Email -->
+    <!-- Step 1: Login -->
     <div id="loginStep1">
       <div class="form-group">
         <label>Email</label>
         <input type="email" id="loginEmail" placeholder="email@domain.com">
       </div>
+      <div class="form-group" style="margin-top:12px;">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Password">
+      </div>
       <div class="modal-btns">
-        <button class="btn btn-block" id="loginSendOtpBtn">Kirim Kode OTP</button>
+        <button class="btn btn-block" id="loginBtnAction">Login</button>
       </div>
       <p style="text-align:center;font-size:13px;margin-top:12px;color:var(--paper-dim);">
-        Belum punya akun? <a href="#" id="goToRegister" style="color:var(--gold-soft);text-decoration:none;">Registrasi di sini</a>
+        Belum punya akun? <a href="#" id="goToRegister" style="color:var(--gold-soft);text-decoration:none;">Daftar di sini</a>
       </p>
     </div>
 
-    <!-- Step 2: Input OTP -->
-    <div id="loginStep2" style="display:none;">
-      <p style="color:var(--jade-soft);font-size:13px;" id="otpSentInfo">✅ Kode OTP telah dikirim ke <span id="otpEmailDisplay">—</span></p>
-      <div class="otp-container">
-        <input type="text" maxlength="1" class="otp-input" data-index="0">
-        <input type="text" maxlength="1" class="otp-input" data-index="1">
-        <input type="text" maxlength="1" class="otp-input" data-index="2">
-        <input type="text" maxlength="1" class="otp-input" data-index="3">
-        <input type="text" maxlength="1" class="otp-input" data-index="4">
-        <input type="text" maxlength="1" class="otp-input" data-index="5">
-      </div>
-      <div class="modal-btns">
-        <button class="btn btn-block" id="verifyOtpBtn">Verifikasi</button>
-      </div>
-      <p style="text-align:center;font-size:13px;margin-top:12px;color:var(--paper-dim);">
-        Tidak menerima kode? <a href="#" id="resendOtpBtn" style="color:var(--gold-soft);text-decoration:none;">Kirim ulang</a>
-      </p>
-      <p style="text-align:center;font-size:12px;margin-top:6px;color:var(--paper-dim);opacity:0.5;" id="otpTimer">Kirim ulang dalam 60 detik</p>
-    </div>
-
-    <!-- Step 3: Registrasi -->
+    <!-- Step 2: Register -->
     <div id="registerStep" style="display:none;">
-      <p style="color:var(--paper-dim);font-size:13px;">
-        Email <strong id="regEmailDisplay">—</strong> belum terdaftar. Silakan lengkapi data di bawah ini.
-      </p>
+      <p style="color:var(--paper-dim);font-size:13px;">Buat akun baru untuk mulai menghitung.</p>
       <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="regEmail" placeholder="email@domain.com">
+      </div>
+      <div class="form-group" style="margin-top:12px;">
+        <label>Password</label>
+        <input type="password" id="regPassword" placeholder="Minimal 6 karakter">
+      </div>
+      <div class="form-group" style="margin-top:12px;">
         <label>Nama Lengkap</label>
         <input type="text" id="regName" placeholder="Nama lengkap">
       </div>
       <div class="form-group" style="margin-top:12px;">
         <label>No HP</label>
         <input type="tel" id="regPhone" placeholder="08123456789">
-      </div>
-      <div class="form-group" style="margin-top:12px;">
-        <label>Password</label>
-        <input type="password" id="regPassword" placeholder="Minimal 6 karakter">
       </div>
       <div class="modal-btns">
         <button class="btn btn-block" id="registerSubmitBtn">Kirim Kode OTP</button>
@@ -854,7 +840,7 @@ ul.trait-list li:last-child{border-bottom:none;}
       </p>
     </div>
 
-    <!-- Step 4: Registrasi OTP -->
+    <!-- Step 3: Register OTP Verification -->
     <div id="registerOtpStep" style="display:none;">
       <p style="color:var(--jade-soft);font-size:13px;">✅ Kode OTP telah dikirim ke <span id="regOtpEmailDisplay">—</span></p>
       <div class="otp-container">
@@ -873,7 +859,7 @@ ul.trait-list li:last-child{border-bottom:none;}
       </p>
     </div>
 
-    <!-- Step 5: Token -->
+    <!-- Step 4: Token -->
     <div id="tokenStep" style="display:none;">
       <p style="color:var(--paper-dim);font-size:13px;">
         Masukkan token perpanjang yang diberikan oleh admin.
@@ -1004,7 +990,7 @@ const CONFIG = {
 };
 
 // ============================================================
-// DATA from Excel
+// DATA from Excel (LENGKAP - SAMA PERSIS)
 // ============================================================
 const MEANING_DATA = {
 "112":"Orang Yang Sangat Percaya Diri & Pintar Bicara, komunikasi sangat keras, ada kuasa, status pernikahan yang berbeda/pasti tidak bahagia. Status kesehatan yang kurang dan di atas usia 40 tahun tidak di senangin lagi di ajak bicara oleh orang lain. Sangat keras pendirian.",
@@ -1218,7 +1204,7 @@ function clearSession() {
 }
 
 // ============================================================
-// OTP FUNCTIONS (TETAP)
+// OTP FUNCTIONS (TETAP - HANYA UNTUK REGISTER)
 // ============================================================
 function generateOTP() { return String(Math.floor(100000 + Math.random() * 900000)); }
 function saveOTP(email, otp) { localStorage.setItem('otp_' + email, JSON.stringify({ code: otp, created_at: getNowISO(), attempts: 0 })); }
@@ -1468,7 +1454,7 @@ async function deleteAllUserHistory(email) {
 }
 
 // ============================================================
-// FUNGSI PERHITUNGAN
+// FUNGSI PERHITUNGAN (SAMA PERSIS)
 // ============================================================
 function reduceDigit(n){
   n = Math.abs(Math.round(n));
@@ -1671,7 +1657,7 @@ function buildCalcDiagram(profile, mainCharName){
 }
 
 // ============================================================
-// DISPLAY RESULT
+// DISPLAY RESULT (SAMA PERSIS)
 // ============================================================
 function displayResult(name, dobDisplay, profile){
   var el = document.getElementById('results');
@@ -2072,49 +2058,34 @@ async function updateStatusBar() {
 // ============================================================
 // MODAL FUNCTIONS
 // ============================================================
-let currentModalStep = 'login';
-
 function showModal(step, email) {
     const modal = document.getElementById('loginModal');
     modal.classList.add('show');
     
     document.getElementById('loginStep1').style.display = 'none';
-    document.getElementById('loginStep2').style.display = 'none';
     document.getElementById('registerStep').style.display = 'none';
     document.getElementById('registerOtpStep').style.display = 'none';
     document.getElementById('tokenStep').style.display = 'none';
     
     if (step === 'login') {
-        currentModalStep = 'login';
         document.getElementById('modalIcon').textContent = '🔐';
-        document.getElementById('modalTitle').textContent = 'Login untuk Menghitung';
-        document.getElementById('modalSub').textContent = 'Masukkan email Anda untuk melanjutkan.';
+        document.getElementById('modalTitle').textContent = 'Login';
+        document.getElementById('modalSub').textContent = 'Masukkan email dan password Anda.';
         document.getElementById('loginStep1').style.display = 'block';
         document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
         document.getElementById('loginEmail').focus();
-    } else if (step === 'otp') {
-        currentModalStep = 'otp';
-        document.getElementById('modalIcon').textContent = '📧';
-        document.getElementById('modalTitle').textContent = 'Verifikasi Kode OTP';
-        document.getElementById('modalSub').textContent = 'Masukkan kode 6 digit yang dikirim ke email Anda.';
-        document.getElementById('loginStep2').style.display = 'block';
-        document.getElementById('otpEmailDisplay').textContent = email || '—';
-        document.querySelectorAll('.otp-input').forEach(inp => inp.value = '');
-        document.querySelector('.otp-input').focus();
-        startOtpTimer();
     } else if (step === 'register') {
-        currentModalStep = 'register';
         document.getElementById('modalIcon').textContent = '📝';
         document.getElementById('modalTitle').textContent = 'Registrasi Akun Baru';
-        document.getElementById('modalSub').textContent = 'Lengkapi data di bawah ini untuk mendaftar.';
+        document.getElementById('modalSub').textContent = 'Buat akun untuk mulai menghitung.';
         document.getElementById('registerStep').style.display = 'block';
-        document.getElementById('regEmailDisplay').textContent = email || '—';
+        document.getElementById('regEmail').value = '';
+        document.getElementById('regPassword').value = '';
         document.getElementById('regName').value = '';
         document.getElementById('regPhone').value = '';
-        document.getElementById('regPassword').value = '';
-        document.getElementById('regName').focus();
+        document.getElementById('regEmail').focus();
     } else if (step === 'register_otp') {
-        currentModalStep = 'register_otp';
         document.getElementById('modalIcon').textContent = '📧';
         document.getElementById('modalTitle').textContent = 'Verifikasi Kode OTP';
         document.getElementById('modalSub').textContent = 'Masukkan kode 6 digit yang dikirim ke email Anda.';
@@ -2123,7 +2094,6 @@ function showModal(step, email) {
         document.querySelectorAll('.otp-input-reg').forEach(inp => inp.value = '');
         document.querySelector('.otp-input-reg').focus();
     } else if (step === 'token') {
-        currentModalStep = 'token';
         document.getElementById('modalIcon').textContent = '🔑';
         document.getElementById('modalTitle').textContent = 'Masukkan Token Perpanjang';
         document.getElementById('modalSub').textContent = 'Masukkan token yang diberikan oleh admin.';
@@ -2135,31 +2105,6 @@ function showModal(step, email) {
 
 function hideModal() {
     document.getElementById('loginModal').classList.remove('show');
-}
-
-let otpTimerInterval = null;
-let otpSecondsLeft = 60;
-
-function startOtpTimer() {
-    const timerEl = document.getElementById('otpTimer');
-    const resendBtn = document.getElementById('resendOtpBtn');
-    otpSecondsLeft = 60;
-    timerEl.style.display = 'block';
-    resendBtn.style.pointerEvents = 'none';
-    resendBtn.style.opacity = '0.5';
-    
-    clearInterval(otpTimerInterval);
-    otpTimerInterval = setInterval(function() {
-        otpSecondsLeft--;
-        if (otpSecondsLeft <= 0) {
-            clearInterval(otpTimerInterval);
-            timerEl.style.display = 'none';
-            resendBtn.style.pointerEvents = 'auto';
-            resendBtn.style.opacity = '1';
-        } else {
-            timerEl.textContent = 'Kirim ulang dalam ' + otpSecondsLeft + ' detik';
-        }
-    }, 1000);
 }
 
 // ============================================================
@@ -2291,22 +2236,6 @@ async function calculateWithoutQuota() {
 // ============================================================
 // OTP INPUT AUTO-FOCUS
 // ============================================================
-document.querySelectorAll('.otp-input').forEach((input, index) => {
-    input.addEventListener('input', function() {
-        if (this.value.length === 1 && index < 5) {
-            document.querySelectorAll('.otp-input')[index + 1].focus();
-        }
-    });
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
-            document.querySelectorAll('.otp-input')[index - 1].focus();
-        }
-        if (e.key === 'Enter') {
-            document.getElementById('verifyOtpBtn').click();
-        }
-    });
-});
-
 document.querySelectorAll('.otp-input-reg').forEach((input, index) => {
     input.addEventListener('input', function() {
         if (this.value.length === 1 && index < 5) {
@@ -2341,34 +2270,19 @@ document.getElementById('dobMonth').addEventListener('input', function() {
 // ============================================================
 // BUTTON EVENT HANDLERS
 // ============================================================
-document.getElementById('loginSendOtpBtn').addEventListener('click', async function() {
-    const email = document.getElementById('loginEmail').value.trim();
-    if (!email || !email.includes('@') || !email.includes('.')) {
-        alert('Masukkan email yang valid.');
-        return;
-    }
-    
-    const user = await getUser(email);
-    if (user) {
-        sendOTP(email);
-        showModal('otp', email);
-    } else {
-        showModal('register', email);
-    }
-});
 
-document.getElementById('verifyOtpBtn').addEventListener('click', async function() {
-    const email = document.getElementById('otpEmailDisplay').textContent;
-    let otp = '';
-    document.querySelectorAll('.otp-input').forEach(inp => otp += inp.value);
+// --- LOGIN (PAKAI PASSWORD) ---
+document.getElementById('loginBtnAction').addEventListener('click', async function() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
     
-    if (otp.length !== 6) {
-        alert('Masukkan 6 digit kode OTP.');
+    if (!email || !password) {
+        alert('Masukkan email dan password.');
         return;
     }
     
-    const result = verifyOTP(email, otp);
-    if (result.valid) {
+    try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
         const user = await getUser(email);
         if (user) {
             setSession(email, user.name);
@@ -2376,37 +2290,42 @@ document.getElementById('verifyOtpBtn').addEventListener('click', async function
             updateStatusBar();
             alert('✅ Login berhasil! Selamat datang, ' + user.name + '!');
         } else {
-            alert('❌ Akun tidak ditemukan. Silakan registrasi.');
+            alert('❌ Data user tidak ditemukan.');
+            await auth.signOut();
         }
-    } else {
-        alert('❌ ' + result.message);
+    } catch (error) {
+        if (error.code === 'auth/user-not-found') {
+            alert('❌ Email belum terdaftar. Silakan registrasi terlebih dahulu.');
+            showModal('register', email);
+        } else if (error.code === 'auth/wrong-password') {
+            alert('❌ Password salah. Silakan coba lagi.');
+        } else {
+            alert('❌ ' + error.message);
+        }
     }
 });
 
-document.getElementById('resendOtpBtn').addEventListener('click', function(e) {
-    e.preventDefault();
-    const email = document.getElementById('otpEmailDisplay').textContent;
-    sendOTP(email);
-    startOtpTimer();
-    alert('📧 Kode OTP baru telah dikirim ke ' + email);
-});
-
+// --- REGISTER ---
 document.getElementById('registerSubmitBtn').addEventListener('click', async function() {
-    const email = document.getElementById('regEmailDisplay').textContent;
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
     const name = document.getElementById('regName').value.trim();
     const phone = document.getElementById('regPhone').value.trim();
-    const password = document.getElementById('regPassword').value;
     
+    if (!email || !email.includes('@') || !email.includes('.')) {
+        alert('Masukkan email yang valid.');
+        return;
+    }
+    if (!password || password.length < 6) {
+        alert('Password minimal 6 karakter.');
+        return;
+    }
     if (!name || name.length < 2) {
         alert('Masukkan nama lengkap Anda.');
         return;
     }
     if (!phone || phone.length < 10 || phone.length > 13) {
         alert('Masukkan nomor HP yang valid (10-13 digit).');
-        return;
-    }
-    if (!password || password.length < 6) {
-        alert('Password minimal 6 karakter.');
         return;
     }
     
@@ -2435,6 +2354,7 @@ document.getElementById('registerSubmitBtn').addEventListener('click', async fun
     showModal('register_otp', email);
 });
 
+// --- VERIFY REGISTER OTP ---
 document.getElementById('verifyRegOtpBtn').addEventListener('click', async function() {
     const email = document.getElementById('regOtpEmailDisplay').textContent;
     let otp = '';
@@ -2480,6 +2400,7 @@ document.getElementById('verifyRegOtpBtn').addEventListener('click', async funct
     }
 });
 
+// --- RESEND REGISTER OTP ---
 document.getElementById('resendRegOtpBtn').addEventListener('click', function(e) {
     e.preventDefault();
     const email = document.getElementById('regOtpEmailDisplay').textContent;
@@ -2487,6 +2408,7 @@ document.getElementById('resendRegOtpBtn').addEventListener('click', function(e)
     alert('📧 Kode OTP baru telah dikirim ke ' + email);
 });
 
+// --- REDEEM TOKEN ---
 document.getElementById('redeemTokenBtn').addEventListener('click', async function() {
     var session = getSession();
     if (!session) {
@@ -2524,14 +2446,11 @@ document.getElementById('redeemTokenBtn').addEventListener('click', async functi
     }
 });
 
+// --- NAVIGASI MODAL ---
 document.getElementById('goToRegister').addEventListener('click', function(e) {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
-    if (!email) {
-        alert('Masukkan email Anda terlebih dahulu.');
-        return;
-    }
-    showModal('register', email);
+    showModal('register', email || '');
 });
 
 document.getElementById('goToLogin').addEventListener('click', function(e) {
@@ -2544,14 +2463,8 @@ document.getElementById('closeModalBtn').addEventListener('click', function(e) {
     hideModal();
 });
 
-document.getElementById('logoutBtn').addEventListener('click', function() {
-    if (confirm('Yakin ingin logout?')) {
-        auth.signOut();
-        clearSession();
-        updateStatusBar();
-        document.getElementById('results').style.display = 'none';
-        alert('Anda telah logout.');
-    }
+document.getElementById('loginBtn').addEventListener('click', function() {
+    showModal('login');
 });
 
 document.getElementById('tokenBtn').addEventListener('click', function() {
@@ -2563,8 +2476,14 @@ document.getElementById('tokenBtn').addEventListener('click', function() {
     showModal('token');
 });
 
-document.getElementById('loginBtn').addEventListener('click', function() {
-    showModal('login');
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    if (confirm('Yakin ingin logout?')) {
+        auth.signOut();
+        clearSession();
+        updateStatusBar();
+        document.getElementById('results').style.display = 'none';
+        alert('Anda telah logout.');
+    }
 });
 
 // ============================================================
@@ -2681,8 +2600,8 @@ updateStatusBar();
 
 console.log('🚀 Aplikasi siap dengan Firebase!');
 console.log('📌 Data di Firestore: users, licenses, codes, history');
-console.log('🔐 Firebase Auth untuk login');
-console.log('📧 OTP via EmailJS untuk verifikasi');
+console.log('🔐 Firebase Auth untuk login (Email + Password)');
+console.log('📧 OTP via EmailJS untuk verifikasi register');
 </script>
 </body>
 </html>
