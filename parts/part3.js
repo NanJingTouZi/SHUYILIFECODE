@@ -509,10 +509,12 @@ function sendOTP(email) {
     // Kirim via Google Apps Script
     if (!CONFIG.IS_LOCAL && CONFIG.GOOGLE_APPS_SCRIPT_URL) {
         console.log('📧 Mengirim OTP ke ' + email + ' via Google Apps Script...');
+        console.log('📤 URL:', CONFIG.GOOGLE_APPS_SCRIPT_URL);
         
+        // Gunakan mode 'cors' agar bisa melihat response
         fetch(CONFIG.GOOGLE_APPS_SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors',
+            mode: 'cors',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -521,12 +523,27 @@ function sendOTP(email) {
                 otp: otp
             })
         })
-        .then(() => {
-            console.log('📧 Email OTP terkirim ke ' + email);
-            console.log('💡 Cek inbox ' + email + ' (termasuk folder Spam)');
+        .then(response => {
+            console.log('📥 Response status:', response.status);
+            return response.text();
+        })
+        .then(data => {
+            console.log('📥 Response data:', data);
+            try {
+                const json = JSON.parse(data);
+                if (json.success) {
+                    console.log('📧 Email OTP terkirim ke ' + email);
+                    console.log('💡 Cek inbox ' + email + ' (termasuk folder Spam)');
+                } else {
+                    console.log('❌ Gagal kirim email:', json.error);
+                    console.log('📧 [FALLBACK] OTP untuk ' + email + ': ' + otp);
+                }
+            } catch(e) {
+                console.log('📧 [FALLBACK] OTP untuk ' + email + ': ' + otp);
+            }
         })
         .catch(error => {
-            console.log('❌ Gagal kirim email:', error);
+            console.log('❌ Error:', error);
             console.log('📧 [FALLBACK] OTP untuk ' + email + ': ' + otp);
         });
     } else {
