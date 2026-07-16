@@ -37,9 +37,6 @@ body{
 }
 .wrap{max-width:1200px;margin:0 auto;padding:40px 22px 60px;}
 
-/* ============================================================
-   HEADER
-   ============================================================ */
 .header{
   display:flex;justify-content:space-between;align-items:center;
   padding-bottom:20px;border-bottom:1px solid var(--line);
@@ -57,9 +54,6 @@ body{
 }
 .header .logout-btn:hover{background:rgba(180,72,58,0.15);}
 
-/* ============================================================
-   PIN LOGIN
-   ============================================================ */
 .pin-overlay{
   display:flex;
   position:fixed;top:0;left:0;right:0;bottom:0;
@@ -101,9 +95,6 @@ body{
 .pin-box .btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(201,162,74,0.3);}
 .pin-box .err{color:var(--cinnabar);font-size:13px;margin-top:10px;display:none;}
 
-/* ============================================================
-   STATS
-   ============================================================ */
 .stats-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;
   margin-bottom:28px;
@@ -123,9 +114,6 @@ body{
 .stat-card .num.orange{color:#f0b84d;}
 .stat-card .label{color:var(--paper-dim);font-size:12px;margin-top:2px;}
 
-/* ============================================================
-   TABLE
-   ============================================================ */
 .table-container{
   background:linear-gradient(180deg,var(--panel),var(--panel-2));
   border:1px solid var(--line);border-radius:12px;
@@ -196,9 +184,6 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 }
 .delete-btn:hover{background:rgba(180,72,58,0.15);}
 
-/* ============================================================
-   GENERATE CODE SECTION
-   ============================================================ */
 .generate-section{
   background:linear-gradient(180deg,var(--panel),var(--panel-2));
   border:1px solid var(--line);border-radius:12px;
@@ -249,9 +234,6 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 }
 .generate-result .code-chip .copy-btn{font-size:14px;}
 
-/* ============================================================
-   TAB
-   ============================================================ */
 .tabs{display:flex;gap:4px;margin-bottom:18px;flex-wrap:wrap;}
 .tabs .tab{
   padding:8px 20px;border-radius:8px 8px 0 0;
@@ -267,9 +249,6 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 .tab-content{display:none;}
 .tab-content.active{display:block;}
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
 @media (max-width:768px){
   .generate-form{flex-direction:column;align-items:stretch;}
   .generate-form .form-group{min-width:auto;}
@@ -518,72 +497,129 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 
 <script>
 // ============================================================
-// CONFIG
+// KONFIGURASI GITHUB (SAMA DENGAN INDEX.HTML)
 // ============================================================
-const ADMIN_PIN = '614931';
-const IS_LOCAL = true;
-
-// ============================================================
-// DATA STORE
-// ============================================================
-const DATA = {
-    users: {},
-    licenses: {},
-    codes: {},
-    history: {}
+const CONFIG = {
+    GITHUB_TOKEN: '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',
+    GITHUB_OWNER: 'nanjingtouzi',
+    GITHUB_REPO: 'SHUYILIFECODE',
+    GITHUB_BRANCH: 'main',
+    DATA_FILE: 'data.json',
+    ADMIN_PIN: '123456'
 };
 
 // ============================================================
-// LOAD DATA
+// GITHUB DATA MANAGER (SAMA DENGAN INDEX.HTML)
 // ============================================================
-function loadLocalData() {
-    const keys = ['users', 'licenses', 'codes', 'history'];
-    keys.forEach(key => {
-        const data = localStorage.getItem('local_' + key);
-        if (data) {
-            DATA[key] = JSON.parse(data);
-        } else {
-            DATA[key] = {};
+class GitHubDataManager {
+    constructor() {
+        this.cache = null;
+        this.lastFetch = 0;
+        this.cacheTTL = 3000;
+    }
+
+    get apiUrl() {
+        return `https://api.github.com/repos/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/contents/${CONFIG.DATA_FILE}`;
+    }
+
+    get rawUrl() {
+        return `https://raw.githubusercontent.com/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/${CONFIG.GITHUB_BRANCH}/${CONFIG.DATA_FILE}`;
+    }
+
+    async read() {
+        if (this.cache && (Date.now() - this.lastFetch < this.cacheTTL)) {
+            return this.cache;
         }
-    });
+        try {
+            const response = await fetch(this.rawUrl, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `token ${CONFIG.GITHUB_TOKEN}`
+                }
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            this.cache = data;
+            this.lastFetch = Date.now();
+            return data;
+        } catch (error) {
+            console.error('❌ Gagal baca dari GitHub:', error);
+            if (this.cache) return this.cache;
+            return { users: {}, licenses: {}, codes: {}, history: {} };
+        }
+    }
+
+    async write(data) {
+        try {
+            const response = await fetch(this.apiUrl, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `token ${CONFIG.GITHUB_TOKEN}`
+                }
+            });
+            let sha = null;
+            if (response.ok) {
+                const fileInfo = await response.json();
+                sha = fileInfo.sha;
+            }
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+            const commitResponse = await fetch(this.apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `token ${CONFIG.GITHUB_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Admin update data ${new Date().toISOString()}`,
+                    content: content,
+                    sha: sha,
+                    branch: CONFIG.GITHUB_BRANCH
+                })
+            });
+            if (!commitResponse.ok) throw new Error(`HTTP ${commitResponse.status}`);
+            this.cache = data;
+            this.lastFetch = Date.now();
+            console.log('✅ Admin: Data berhasil disimpan ke GitHub');
+            return true;
+        } catch (error) {
+            console.error('❌ Admin: Gagal simpan ke GitHub:', error);
+            throw error;
+        }
+    }
+
+    async addCode(token, type, amount, duration) {
+        const data = await this.read();
+        data.codes[token] = { 
+            type: type, 
+            amount: amount || 10, 
+            duration: duration || 30, 
+            used: false, 
+            used_by: null,
+            used_at: null,
+            created_at: new Date().toISOString() 
+        };
+        await this.write(data);
+    }
 }
 
-function loadData() {
-    if (IS_LOCAL) {
-        loadLocalData();
-        return true;
-    }
-    return true;
-}
+const db = new GitHubDataManager();
 
 // ============================================================
-// CEK SESSION ADMIN DI LOCALSTORAGE
+// DATA REFERENCE (untuk akses cepat)
 // ============================================================
-function checkAdminSession() {
-    const session = localStorage.getItem('admin_session');
-    if (session === 'true') {
-        document.getElementById('pinOverlay').classList.add('hidden');
-        document.getElementById('dashboardWrap').style.display = 'block';
-        loadData();
-        renderAll();
-        updateClock();
-        setInterval(updateClock, 60000);
-        return true;
-    }
-    return false;
-}
+let DATA = { users: {}, licenses: {}, codes: {}, history: {} };
 
 // ============================================================
 // PIN LOGIN
 // ============================================================
-document.getElementById('pinSubmitBtn').addEventListener('click', function() {
+document.getElementById('pinSubmitBtn').addEventListener('click', async function() {
     const pin = document.getElementById('pinInput').value;
     const errEl = document.getElementById('pinErr');
-    if (pin === ADMIN_PIN) {
-        localStorage.setItem('admin_session', 'true');
+    if (pin === CONFIG.ADMIN_PIN) {
         document.getElementById('pinOverlay').classList.add('hidden');
         document.getElementById('dashboardWrap').style.display = 'block';
-        loadData();
+        await loadData();
         renderAll();
         updateClock();
         setInterval(updateClock, 60000);
@@ -602,6 +638,20 @@ document.getElementById('pinInput').addEventListener('keydown', function(e) {
 });
 
 // ============================================================
+// LOAD DATA FROM GITHUB
+// ============================================================
+async function loadData() {
+    try {
+        DATA = await db.read();
+        console.log('✅ Admin: Data loaded from GitHub');
+        return true;
+    } catch (error) {
+        console.error('❌ Admin: Gagal load data:', error);
+        return false;
+    }
+}
+
+// ============================================================
 // CLOCK
 // ============================================================
 function updateClock() {
@@ -610,11 +660,10 @@ function updateClock() {
 }
 
 // ============================================================
-// ADMIN LOGOUT (HAPUS SESSION)
+// ADMIN LOGOUT
 // ============================================================
 document.getElementById('adminLogoutBtn').addEventListener('click', function() {
     if (confirm('Yakin ingin logout dari admin dashboard?')) {
-        localStorage.removeItem('admin_session');
         document.getElementById('pinOverlay').classList.remove('hidden');
         document.getElementById('dashboardWrap').style.display = 'none';
         document.getElementById('pinInput').value = '';
@@ -839,7 +888,7 @@ function renderCodes() {
         const statusClass = code.used ? 'code-used' : 'code-available';
         const usedBy = code.used_by || '-';
         const usedAt = code.used_at ? new Date(code.used_at).toLocaleDateString('id-ID') : '-';
-        const created = code.created_at || '-';
+        const created = code.created_at ? new Date(code.created_at).toLocaleDateString('id-ID') : '-';
         
         let typeText = '-';
         if (code.type === 'time') typeText = '⏰ ' + (code.duration || 0) + ' hari';
@@ -854,7 +903,7 @@ function renderCodes() {
         html += '<td>' + (code.amount || '-') + '</td>';
         html += '<td class="' + statusClass + '">' + statusText + '</td>';
         html += '<td>' + esc(usedBy) + '</td>';
-        html += '<td>' + (code.used_at ? new Date(code.used_at).toLocaleDateString('id-ID') : created) + '</td>';
+        html += '<td>' + (code.used_at ? usedAt : created) + '</td>';
         html += '<td>';
         if (!code.used) {
             html += '<button class="copy-btn" data-code="' + esc(key) + '">📋 Salin</button>';
@@ -1006,65 +1055,73 @@ function getTodayStr() {
 }
 
 // ============================================================
-// GENERATE CODES
+// GENERATE CODES (SIMPAN KE GITHUB)
 // ============================================================
-document.getElementById('generateBtn').addEventListener('click', function() {
+document.getElementById('generateBtn').addEventListener('click', async function() {
     const type = document.getElementById('genType').value;
     const count = parseInt(document.getElementById('genCount').value) || 5;
     const resultEl = document.getElementById('generateResult');
+    const btn = this;
     
-    let newCodes = [];
-    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    btn.disabled = true;
+    btn.textContent = '⏳ Memproses...';
     
-    for (let i = 0; i < count; i++) {
-        const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-        const key = 'EXTEND-' + date + '-' + random;
+    try {
+        let newCodes = [];
+        const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
         
-        let codeData = { used: false, used_by: null, used_at: null, created_at: getTodayStr() };
-        
-        if (type === 'time') {
-            codeData.type = 'time';
-            codeData.duration = 30;
-            codeData.amount = null;
-        } else if (type === 'time90') {
-            codeData.type = 'time';
-            codeData.duration = 90;
-            codeData.amount = null;
-        } else if (type === 'quota') {
-            codeData.type = 'quota';
-            codeData.duration = null;
-            codeData.amount = 10;
-        } else if (type === 'both') {
-            codeData.type = 'both';
-            codeData.duration = 30;
-            codeData.amount = 10;
+        for (let i = 0; i < count; i++) {
+            const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const key = 'EXTEND-' + date + '-' + random;
+            
+            let amount = null, duration = null;
+            let codeType = type;
+            
+            if (type === 'time') {
+                duration = 30;
+            } else if (type === 'time90') {
+                duration = 90;
+            } else if (type === 'quota') {
+                amount = 10;
+            } else if (type === 'both') {
+                duration = 30;
+                amount = 10;
+            }
+            
+            await db.addCode(key, codeType, amount, duration);
+            newCodes.push(key);
         }
         
-        DATA.codes[key] = codeData;
-        newCodes.push(key);
-    }
-    
-    localStorage.setItem('local_codes', JSON.stringify(DATA.codes));
-    
-    resultEl.style.display = 'flex';
-    let html = '';
-    newCodes.forEach(key => {
-        html += '<span class="code-chip">' + esc(key) + ' <button class="copy-btn" data-code="' + esc(key) + '">📋</button></span>';
-    });
-    html += '<span style="color:var(--jade-soft);font-size:12px;margin-left:8px;">✅ ' + count + ' token berhasil dibuat!</span>';
-    resultEl.innerHTML = html;
-    
-    resultEl.querySelectorAll('.copy-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const code = this.dataset.code;
-            navigator.clipboard.writeText(code).then(() => {
-                this.textContent = '✅';
-                setTimeout(() => { this.textContent = '📋'; }, 2000);
+        // Reload data
+        await loadData();
+        renderAll();
+        
+        resultEl.style.display = 'flex';
+        let html = '';
+        newCodes.forEach(key => {
+            html += '<span class="code-chip">' + esc(key) + ' <button class="copy-btn" data-code="' + esc(key) + '">📋</button></span>';
+        });
+        html += '<span style="color:var(--jade-soft);font-size:12px;margin-left:8px;">✅ ' + count + ' token berhasil dibuat di GitHub!</span>';
+        resultEl.innerHTML = html;
+        
+        resultEl.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const code = this.dataset.code;
+                navigator.clipboard.writeText(code).then(() => {
+                    this.textContent = '✅';
+                    setTimeout(() => { this.textContent = '📋'; }, 2000);
+                });
             });
         });
-    });
-    
-    renderAll();
+        
+        alert('✅ ' + count + ' token berhasil dibuat dan disimpan di GitHub!');
+        
+    } catch (error) {
+        alert('❌ Gagal membuat token: ' + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '🚀 Generate Token';
+    }
 });
 
 // ============================================================
@@ -1108,10 +1165,22 @@ function getLicenseByEmail(email) {
 // ============================================================
 // REFRESH BUTTONS
 // ============================================================
-document.getElementById('refreshUsersBtn').addEventListener('click', function() { renderUsers(); });
-document.getElementById('refreshLicensesBtn').addEventListener('click', function() { renderLicenses(); });
-document.getElementById('refreshCodesBtn').addEventListener('click', function() { renderCodes(); });
-document.getElementById('refreshHistoryBtn').addEventListener('click', function() { renderHistory(); });
+document.getElementById('refreshUsersBtn').addEventListener('click', async function() {
+    await loadData();
+    renderUsers();
+});
+document.getElementById('refreshLicensesBtn').addEventListener('click', async function() {
+    await loadData();
+    renderLicenses();
+});
+document.getElementById('refreshCodesBtn').addEventListener('click', async function() {
+    await loadData();
+    renderCodes();
+});
+document.getElementById('refreshHistoryBtn').addEventListener('click', async function() {
+    await loadData();
+    renderHistory();
+});
 
 // Search & Filter
 document.getElementById('userSearch').addEventListener('input', renderUsers);
@@ -1121,22 +1190,12 @@ document.getElementById('codeFilter').addEventListener('change', renderCodes);
 document.getElementById('historySearch').addEventListener('input', renderHistory);
 
 // ============================================================
-// INIT - CEK SESSION ADMIN
+// INIT
 // ============================================================
-// Cek apakah admin sudah login sebelumnya
-const adminSession = localStorage.getItem('admin_session');
-if (adminSession === 'true') {
-    document.getElementById('pinOverlay').classList.add('hidden');
-    document.getElementById('dashboardWrap').style.display = 'block';
-    loadData();
-    renderAll();
-    updateClock();
-    setInterval(updateClock, 60000);
-}
-
 console.log('🔐 Admin Dashboard siap!');
-console.log('📌 Mode: LOCAL (data dari localStorage)');
-console.log('🔑 PIN: ' + ADMIN_PIN);
+console.log('📌 Mode: GITHUB (data dari GitHub)');
+console.log('📌 Repository: ' + CONFIG.GITHUB_OWNER + '/' + CONFIG.GITHUB_REPO);
+console.log('🔑 PIN: ' + CONFIG.ADMIN_PIN);
 </script>
 </body>
 </html>
