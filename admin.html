@@ -412,6 +412,24 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
   gap:10px;
   flex-wrap:wrap;
 }
+.popup-input{
+  width:100%;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid rgba(201,162,74,0.3);
+  background:rgba(0,0,0,0.25);
+  color:var(--paper);
+  font-size:18px;
+  font-family:'Inter',sans-serif;
+  outline:none;
+  text-align:center;
+  letter-spacing:4px;
+  margin:12px 0 16px;
+}
+.popup-input:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(201,162,74,0.15);
+}
 
 @media (max-width:768px){
   .generate-form{flex-direction:column;align-items:stretch;}
@@ -449,6 +467,9 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
     <div class="popup-icon" id="popupIcon">ℹ️</div>
     <h3 class="popup-title" id="popupTitle">Informasi</h3>
     <p class="popup-message" id="popupMessage">Pesan</p>
+    <div id="popupInputContainer" style="display:none;">
+      <input class="popup-input" type="password" id="popupInput" placeholder="••••••" maxlength="6" inputmode="numeric">
+    </div>
     <div class="popup-btns" id="popupButtons">
       <button class="popup-btn" id="popupBtnConfirm">OK</button>
     </div>
@@ -727,39 +748,60 @@ const db = getFirestore(app);
 const ADMIN_PIN = '614931';
 
 // ============================================================
-// CUSTOM POPUP (Pengganti alert/confirm)
+// CUSTOM POPUP (Pengganti alert/confirm/prompt)
 // ============================================================
-function showPopup(type, title, message, confirmText, cancelText, callback) {
+function showPopup(type, title, message, confirmText, cancelText, showInput, callback) {
     return new Promise((resolve) => {
         const overlay = document.getElementById('customPopup');
         const icon = document.getElementById('popupIcon');
         const titleEl = document.getElementById('popupTitle');
         const msgEl = document.getElementById('popupMessage');
         const btnContainer = document.getElementById('popupButtons');
+        const inputContainer = document.getElementById('popupInputContainer');
+        const inputEl = document.getElementById('popupInput');
         
         const icons = {
             'success': '✅',
             'error': '❌',
             'warning': '⚠️',
             'info': 'ℹ️',
-            'confirm': '❓'
+            'confirm': '❓',
+            'pin': '🔑'
         };
         
         icon.textContent = icons[type] || 'ℹ️';
         titleEl.textContent = title || 'Informasi';
         msgEl.textContent = message || '';
         
+        // Handle input
+        if (showInput) {
+            inputContainer.style.display = 'block';
+            inputEl.value = '';
+            inputEl.placeholder = '••••••';
+            inputEl.maxLength = 6;
+            setTimeout(() => inputEl.focus(), 100);
+        } else {
+            inputContainer.style.display = 'none';
+        }
+        
         btnContainer.innerHTML = '';
         
-        if (type === 'confirm') {
-            // Confirm: 2 tombol
+        if (type === 'confirm' || type === 'pin') {
             const btnYes = document.createElement('button');
-            btnYes.textContent = confirmText || 'Ya';
-            btnYes.className = 'popup-btn popup-btn-danger';
+            btnYes.textContent = confirmText || (type === 'pin' ? 'Verifikasi' : 'Ya');
+            btnYes.className = 'popup-btn ' + (type === 'pin' ? 'popup-btn-success' : 'popup-btn-danger');
+            
             btnYes.onclick = function() {
-                overlay.classList.remove('show');
-                resolve(true);
-                if (callback) callback(true);
+                if (type === 'pin') {
+                    const pinValue = inputEl.value;
+                    overlay.classList.remove('show');
+                    resolve(pinValue);
+                    if (callback) callback(pinValue);
+                } else {
+                    overlay.classList.remove('show');
+                    resolve(true);
+                    if (callback) callback(true);
+                }
             };
             
             const btnNo = document.createElement('button');
@@ -767,8 +809,13 @@ function showPopup(type, title, message, confirmText, cancelText, callback) {
             btnNo.className = 'popup-btn popup-btn-cancel';
             btnNo.onclick = function() {
                 overlay.classList.remove('show');
-                resolve(false);
-                if (callback) callback(false);
+                if (type === 'pin') {
+                    resolve(null);
+                    if (callback) callback(null);
+                } else {
+                    resolve(false);
+                    if (callback) callback(false);
+                }
             };
             
             btnContainer.appendChild(btnYes);
@@ -789,6 +836,18 @@ function showPopup(type, title, message, confirmText, cancelText, callback) {
         }
         
         overlay.classList.add('show');
+        
+        // Enter key untuk input
+        if (showInput) {
+            inputEl.onkeydown = function(e) {
+                if (e.key === 'Enter') {
+                    const pinValue = inputEl.value;
+                    overlay.classList.remove('show');
+                    resolve(pinValue);
+                    if (callback) callback(pinValue);
+                }
+            };
+        }
     });
 }
 
@@ -891,7 +950,10 @@ async function deleteUser(email) {
         await deleteDoc(doc(db, 'users', email));
         
         // 2. Hapus license dari collection 'licenses'
-        await deleteDoc(doc(db, 'licenses', email));
+        const licenseDoc = await getDoc(doc(db, 'licenses', email));
+        if (licenseDoc.exists()) {
+            await deleteDoc(doc(db, 'licenses', email));
+        }
         
         // 3. Hapus semua history user
         const historySnapshot = await getDocs(
@@ -1178,7 +1240,6 @@ function renderUsers() {
     }
     tbody.innerHTML = html;
     
-    // Event listener untuk tombol Delete
     tbody.querySelectorAll('.delete-btn-table').forEach(btn => {
         btn.addEventListener('click', async function() {
             const email = this.dataset.email;
@@ -1196,7 +1257,7 @@ function renderUsers() {
                     renderAll();
                     await showPopup('success', 'Berhasil', 'User <strong>' + esc(name) + '</strong> berhasil dihapus.');
                 } else {
-                    await showPopup('error', 'Gagal', 'Gagal menghapus user.');
+                    await showPopup('error', 'Gagal', 'Gagal menghapus user. Silakan coba lagi.');
                 }
             }
         });
@@ -1428,7 +1489,7 @@ function renderHistory() {
 }
 
 // ============================================================
-// GENERATE TOKEN
+// GENERATE TOKEN - DENGAN CUSTOM POPUP PIN
 // ============================================================
 document.getElementById('generateBtn').addEventListener('click', async function() {
     const type = document.getElementById('genType').value;
@@ -1441,7 +1502,10 @@ document.getElementById('generateBtn').addEventListener('click', async function(
     resultEl.style.display = 'none';
     
     try {
-        const pin = prompt('Masukkan PIN Admin:');
+        // PIN input menggunakan custom popup
+        const pin = await showPopup('pin', '🔑 Verifikasi PIN Admin', 
+            'Masukkan PIN Admin untuk melanjutkan.', 'Verifikasi', 'Batal', true);
+        
         if (!pin) {
             btn.disabled = false;
             btn.textContent = '🚀 Generate Token';
