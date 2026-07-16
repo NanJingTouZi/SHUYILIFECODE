@@ -1567,33 +1567,40 @@ function getWALink(email) {
 // UI FUNCTIONS
 // ============================================================
 function updateStatusBar() {
-    console.log('🔄 updateStatusBar() dipanggil');
-    
     var session = getSession();
-    console.log('📧 Session:', session);
-    
     var bar = document.getElementById('userStatusBar');
     var warning = document.getElementById('licenseWarning');
     
-    if (!bar) {
-        console.log('❌ Elemen userStatusBar tidak ditemukan!');
-        return;
-    }
+    // Ambil semua elemen
+    var nameEl = document.getElementById('displayName');
+    var kuotaEl = document.getElementById('displayKuota');
+    var masaEl = document.getElementById('displayMasaAktif');
+    var expiredEl = document.getElementById('displayExpired');
+    var kuotaItem = document.getElementById('kuotaItem');
+    var masaItem = document.getElementById('masaItem');
+    var expiredItem = document.getElementById('expiredItem');
+    var historyBtn = document.getElementById('historyBtn');
+    var tokenBtn = document.getElementById('tokenBtn');
+    var logoutBtn = document.getElementById('logoutBtn');
+    var loginBtn = document.getElementById('loginBtn');
     
+    // Jika elemen tidak ada, berhenti
+    if (!bar) return;
+    
+    // Jika belum login
     if (!session) {
-        console.log('🔴 BELUM LOGIN');
         bar.style.display = 'flex';
         if (warning) warning.style.display = 'none';
         document.getElementById('formCard').style.display = 'block';
         
-        document.getElementById('displayName').textContent = '👤 Belum Login';
-        document.getElementById('kuotaItem').style.display = 'none';
-        document.getElementById('masaItem').style.display = 'none';
-        document.getElementById('expiredItem').style.display = 'none';
-        document.getElementById('historyBtn').style.display = 'none';
-        document.getElementById('tokenBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'none';
-        document.getElementById('loginBtn').style.display = 'inline-block';
+        if (nameEl) nameEl.textContent = '👤 Belum Login';
+        if (kuotaItem) kuotaItem.style.display = 'none';
+        if (masaItem) masaItem.style.display = 'none';
+        if (expiredItem) expiredItem.style.display = 'none';
+        if (historyBtn) historyBtn.style.display = 'none';
+        if (tokenBtn) tokenBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        if (loginBtn) loginBtn.style.display = 'inline-block';
         return;
     }
     
@@ -1604,51 +1611,72 @@ function updateStatusBar() {
         return;
     }
     
-    console.log('🟢 SUDAH LOGIN: ' + user.name);
-    
-    // Tampilkan semua elemen
+    // SUDAH LOGIN - TAMPILKAN SEMUA
     bar.style.display = 'flex';
-    document.getElementById('displayName').textContent = '👤 ' + user.name;
-    document.getElementById('kuotaItem').style.display = 'flex';
-    document.getElementById('masaItem').style.display = 'flex';
-    document.getElementById('expiredItem').style.display = 'flex';
-    document.getElementById('historyBtn').style.display = 'inline-block';
-    document.getElementById('tokenBtn').style.display = 'inline-block';
-    document.getElementById('logoutBtn').style.display = 'inline-block';
-    document.getElementById('loginBtn').style.display = 'none';
+    if (nameEl) nameEl.textContent = '👤 ' + user.name;
+    if (kuotaItem) kuotaItem.style.display = 'flex';
+    if (masaItem) masaItem.style.display = 'flex';
+    if (expiredItem) expiredItem.style.display = 'flex';
+    if (historyBtn) historyBtn.style.display = 'inline-block';
+    if (tokenBtn) tokenBtn.style.display = 'inline-block';
+    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+    if (loginBtn) loginBtn.style.display = 'none';
     
-    // Ambil lisensi
-    var license = getLicense(session.email);
-    console.log('📋 License:', license);
+    // Ambil lisensi langsung dari localStorage
+    var licenses = {};
+    try {
+        licenses = JSON.parse(localStorage.getItem('local_licenses') || '{}');
+    } catch(e) {}
     
-    if (license && license.is_active) {
-        var remaining = license.quota - (license.used_count || 0);
-        var expiry = new Date(license.expiry_date);
+    var userLicense = null;
+    for (var key in licenses) {
+        if (licenses[key].user_email === session.email) {
+            userLicense = licenses[key];
+            break;
+        }
+    }
+    
+    if (userLicense && userLicense.is_active) {
+        var remaining = userLicense.quota - (userLicense.used_count || 0);
+        var expiry = new Date(userLicense.expiry_date);
         var now = new Date();
         var daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
         
-        console.log('📊 Kuota: ' + remaining + '/' + license.quota);
-        console.log('📅 Expired: ' + license.expiry_date);
-        
-        document.getElementById('displayKuota').textContent = remaining + '/' + license.quota;
-        document.getElementById('displayKuota').className = 'val success';
-        document.getElementById('displayMasaAktif').textContent = daysLeft > 0 ? daysLeft : 0;
-        document.getElementById('displayMasaAktif').className = 'val';
-        document.getElementById('displayExpired').textContent = license.expiry_date || '—';
-        document.getElementById('displayExpired').className = 'val';
+        // Update kuota - PASTIKAN INI BERJALAN
+        if (kuotaEl) {
+            kuotaEl.textContent = remaining + '/' + userLicense.quota;
+            kuotaEl.className = 'val success';
+            kuotaEl.style.color = '#7fb59c';
+            kuotaEl.style.fontWeight = 'bold';
+            kuotaEl.style.fontSize = '16px';
+            kuotaEl.style.display = 'inline-block';
+        }
+        if (masaEl) {
+            masaEl.textContent = daysLeft > 0 ? daysLeft : 0;
+            masaEl.className = 'val';
+        }
+        if (expiredEl) {
+            expiredEl.textContent = userLicense.expiry_date || '—';
+            expiredEl.className = 'val';
+        }
         
         if (warning) warning.style.display = 'none';
         document.getElementById('formCard').style.display = 'block';
     } else {
-        console.log('⚠️ Lisensi tidak aktif atau tidak ditemukan');
-        document.getElementById('displayKuota').textContent = '0/0';
-        document.getElementById('displayKuota').className = 'val danger';
-        document.getElementById('displayMasaAktif').textContent = '0';
-        document.getElementById('displayMasaAktif').className = 'val danger';
-        document.getElementById('displayExpired').textContent = '—';
-        document.getElementById('displayExpired').className = 'val danger';
+        if (kuotaEl) {
+            kuotaEl.textContent = '0/0';
+            kuotaEl.className = 'val danger';
+        }
+        if (masaEl) {
+            masaEl.textContent = '0';
+            masaEl.className = 'val danger';
+        }
+        if (expiredEl) {
+            expiredEl.textContent = '—';
+            expiredEl.className = 'val danger';
+        }
         
-        if (license && !license.is_active) {
+        if (userLicense && !userLicense.is_active) {
             if (warning) {
                 warning.style.display = 'block';
                 document.getElementById('licenseWarningDesc').textContent = 'Lisensi Anda tidak aktif. Hubungi admin untuk perpanjang.';
