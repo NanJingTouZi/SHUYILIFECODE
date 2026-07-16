@@ -8,6 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* ============================================================
+   CSS (SAMA PERSIS DENGAN SEBELUMNYA)
+   ============================================================ */
 :root{
   --ink:#12181a;
   --ink-2:#1b2427;
@@ -219,6 +222,7 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
   min-width:140px;
 }
 .generate-form .btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(79,138,114,0.3);}
+.generate-form .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
 .generate-result{
   margin-top:14px;padding:12px 16px;
   background:rgba(0,0,0,0.2);border-radius:8px;
@@ -497,7 +501,7 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 
 <script>
 // ============================================================
-// KONFIGURASI GITHUB (SAMA DENGAN INDEX.HTML)
+// KONFIGURASI GITHUB
 // ============================================================
 const CONFIG = {
     GITHUB_TOKEN: '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',
@@ -509,7 +513,7 @@ const CONFIG = {
 };
 
 // ============================================================
-// GITHUB DATA MANAGER (SAMA DENGAN INDEX.HTML)
+// GITHUB DATA MANAGER
 // ============================================================
 class GitHubDataManager {
     constructor() {
@@ -531,19 +535,27 @@ class GitHubDataManager {
             return this.cache;
         }
         try {
+            console.log('📖 Admin: Membaca data dari GitHub...');
             const response = await fetch(this.rawUrl, {
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `token ${CONFIG.GITHUB_TOKEN}`
                 }
             });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            if (!response.ok) {
+                if (response.status === 404) {
+                    console.log('📄 File data.json belum ada, akan dibuat baru');
+                    return { users: {}, licenses: {}, codes: {}, history: {} };
+                }
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
             const data = await response.json();
             this.cache = data;
             this.lastFetch = Date.now();
+            console.log('✅ Admin: Data berhasil dibaca dari GitHub');
             return data;
         } catch (error) {
-            console.error('❌ Gagal baca dari GitHub:', error);
+            console.error('❌ Admin: Gagal baca dari GitHub:', error);
             if (this.cache) return this.cache;
             return { users: {}, licenses: {}, codes: {}, history: {} };
         }
@@ -551,18 +563,34 @@ class GitHubDataManager {
 
     async write(data) {
         try {
-            const response = await fetch(this.apiUrl, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': `token ${CONFIG.GITHUB_TOKEN}`
-                }
-            });
+            console.log('📝 Admin: Menyimpan data ke GitHub...');
+            
+            // 1. Ambil SHA file
             let sha = null;
-            if (response.ok) {
-                const fileInfo = await response.json();
-                sha = fileInfo.sha;
+            try {
+                const response = await fetch(this.apiUrl, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `token ${CONFIG.GITHUB_TOKEN}`
+                    }
+                });
+                if (response.ok) {
+                    const fileInfo = await response.json();
+                    sha = fileInfo.sha;
+                    console.log('📄 SHA file ditemukan:', sha);
+                } else if (response.status === 404) {
+                    console.log('📄 File baru akan dibuat');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (e) {
+                console.log('📄 File belum ada, akan dibuat baru');
             }
+
+            // 2. Encode ke base64
             const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+            
+            // 3. Commit ke GitHub
             const commitResponse = await fetch(this.apiUrl, {
                 method: 'PUT',
                 headers: {
@@ -573,11 +601,17 @@ class GitHubDataManager {
                 body: JSON.stringify({
                     message: `Admin update data ${new Date().toISOString()}`,
                     content: content,
-                    sha: sha,
+                    sha: sha || undefined,
                     branch: CONFIG.GITHUB_BRANCH
                 })
             });
-            if (!commitResponse.ok) throw new Error(`HTTP ${commitResponse.status}`);
+
+            if (!commitResponse.ok) {
+                const errorData = await commitResponse.json();
+                console.error('❌ Error response:', errorData);
+                throw new Error(`HTTP ${commitResponse.status}: ${errorData.message || commitResponse.statusText}`);
+            }
+
             this.cache = data;
             this.lastFetch = Date.now();
             console.log('✅ Admin: Data berhasil disimpan ke GitHub');
@@ -589,24 +623,27 @@ class GitHubDataManager {
     }
 
     async addCode(token, type, amount, duration) {
+        console.log('🔑 Admin: Menambahkan token:', token);
         const data = await this.read();
         data.codes[token] = { 
             type: type, 
-            amount: amount || 10, 
-            duration: duration || 30, 
+            amount: amount || null, 
+            duration: duration || null, 
             used: false, 
             used_by: null,
             used_at: null,
             created_at: new Date().toISOString() 
         };
         await this.write(data);
+        console.log('✅ Admin: Token berhasil ditambahkan:', token);
+        return true;
     }
 }
 
 const db = new GitHubDataManager();
 
 // ============================================================
-// DATA REFERENCE (untuk akses cepat)
+// DATA REFERENCE
 // ============================================================
 let DATA = { users: {}, licenses: {}, codes: {}, history: {} };
 
@@ -643,7 +680,7 @@ document.getElementById('pinInput').addEventListener('keydown', function(e) {
 async function loadData() {
     try {
         DATA = await db.read();
-        console.log('✅ Admin: Data loaded from GitHub');
+        console.log('✅ Admin: Data loaded, users:', Object.keys(DATA.users).length);
         return true;
     } catch (error) {
         console.error('❌ Admin: Gagal load data:', error);
@@ -1055,7 +1092,7 @@ function getTodayStr() {
 }
 
 // ============================================================
-// GENERATE CODES (SIMPAN KE GITHUB)
+// GENERATE CODES - SIMPAN KE GITHUB
 // ============================================================
 document.getElementById('generateBtn').addEventListener('click', async function() {
     const type = document.getElementById('genType').value;
@@ -1067,6 +1104,8 @@ document.getElementById('generateBtn').addEventListener('click', async function(
     btn.textContent = '⏳ Memproses...';
     
     try {
+        console.log('🚀 Admin: Generate ' + count + ' token, type:', type);
+        
         let newCodes = [];
         const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
         
@@ -1088,9 +1127,12 @@ document.getElementById('generateBtn').addEventListener('click', async function(
                 amount = 10;
             }
             
+            console.log('🔑 Menambahkan token:', key);
             await db.addCode(key, codeType, amount, duration);
             newCodes.push(key);
         }
+        
+        console.log('✅ Semua token berhasil dibuat, reload data...');
         
         // Reload data
         await loadData();
@@ -1117,6 +1159,7 @@ document.getElementById('generateBtn').addEventListener('click', async function(
         alert('✅ ' + count + ' token berhasil dibuat dan disimpan di GitHub!');
         
     } catch (error) {
+        console.error('❌ Gagal membuat token:', error);
         alert('❌ Gagal membuat token: ' + error.message);
     } finally {
         btn.disabled = false;
