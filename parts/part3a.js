@@ -189,12 +189,14 @@ const RELATION_DATA = [
 // CONFIGURATION
 // ============================================================
 const CONFIG = {
-    IS_LOCAL: true,
-    GITHUB_RAW_URL: 'https://raw.githubusercontent.com/username/repo/main/data/',
-    GITHUB_API_URL: 'https://api.github.com/repos/username/repo/contents/data/',
+    IS_LOCAL: false,
+    GITHUB_RAW_URL: 'https://raw.githubusercontent.com/nanjingtouzi/SHUYILIFECODE/main/data/',
+    GITHUB_API_URL: 'https://api.github.com/repos/nanjingtouzi/SHUYILIFECODE/contents/data/',
     GITHUB_TOKEN: '',
     SENDGRID_API_KEY: '',
-    ADMIN_PHONE: '6281944142311',  // ← GANTI DENGAN NOMOR ADMIN ANDA
+    MAILTRAP_API_KEY: '',
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbydyZej9QAfky9eeCILhCclJzLv41K_rsMoEGk9U7dVettISgBP9TCdMDzsz5JQiX3Hhw/exec',
+    ADMIN_PHONE: '6281944142311',
     ADMIN_EMAIL: 'admin@domain.com',
     DEFAULT_QUOTA: 5,
     DEFAULT_DAYS: 30
