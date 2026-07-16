@@ -183,13 +183,75 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
   transition:background .15s;
 }
 .delete-btn:hover{background:rgba(180,72,58,0.15);}
-.edit-btn{
-  background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft);
+
+/* INLINE EDIT BUTTONS */
+.edit-btn, .save-btn, .cancel-btn{
+  background:transparent;border:none;
   border-radius:4px;padding:2px 10px;font-size:11px;cursor:pointer;
-  transition:background .15s;
-  font-family:'Inter',sans-serif;
+  font-family:'Inter',sans-serif;transition:background .15s;
+}
+.edit-btn{
+  border:1px solid var(--gold-soft);color:var(--gold-soft);
 }
 .edit-btn:hover{background:rgba(201,162,74,0.15);}
+.save-btn{
+  border:1px solid var(--jade);color:var(--jade-soft);
+}
+.save-btn:hover{background:rgba(79,138,114,0.15);}
+.cancel-btn{
+  border:1px solid var(--paper-dim);color:var(--paper-dim);
+}
+.cancel-btn:hover{background:rgba(201,162,74,0.05);}
+
+.inline-input{
+  background:rgba(0,0,0,0.25);
+  border:1px solid var(--gold);
+  border-radius:6px;
+  padding:4px 8px;
+  color:var(--paper);
+  font-size:13px;
+  font-family:'Inter',sans-serif;
+  outline:none;
+  width:100%;
+  max-width:100px;
+}
+.inline-input:focus{
+  box-shadow:0 0 0 3px rgba(201,162,74,0.15);
+}
+.inline-select{
+  background:rgba(0,0,0,0.25);
+  border:1px solid var(--gold);
+  border-radius:6px;
+  padding:4px 8px;
+  color:var(--paper);
+  font-size:13px;
+  font-family:'Inter',sans-serif;
+  outline:none;
+  width:100%;
+  max-width:120px;
+}
+.inline-select:focus{
+  box-shadow:0 0 0 3px rgba(201,162,74,0.15);
+}
+.inline-date{
+  background:rgba(0,0,0,0.25);
+  border:1px solid var(--gold);
+  border-radius:6px;
+  padding:4px 8px;
+  color:var(--paper);
+  font-size:13px;
+  font-family:'Inter',sans-serif;
+  outline:none;
+  width:100%;
+  max-width:130px;
+}
+.inline-date:focus{
+  box-shadow:0 0 0 3px rgba(201,162,74,0.15);
+}
+.inline-date::-webkit-calendar-picker-indicator{
+  filter:invert(1);
+  cursor:pointer;
+}
 
 .generate-section{
   background:linear-gradient(180deg,var(--panel),var(--panel-2));
@@ -257,17 +319,6 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 .tab-content{display:none;}
 .tab-content.active{display:block;}
 
-/* Modal Edit License */
-#editLicenseModal .form-group{
-  margin-top:12px;
-}
-#editLicenseModal .form-group:first-child{
-  margin-top:0;
-}
-#editLicenseModal .modal-btns{
-  margin-top:16px;
-}
-
 @media (max-width:768px){
   .generate-form{flex-direction:column;align-items:stretch;}
   .generate-form .form-group{min-width:auto;}
@@ -275,6 +326,7 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
   .stats-grid{grid-template-columns:repeat(2,1fr);}
   .table-header{flex-direction:column;align-items:stretch;}
   .table-controls{flex-wrap:wrap;}
+  .inline-input, .inline-select, .inline-date{max-width:100%;}
 }
 @media (max-width:480px){
   .stats-grid{grid-template-columns:1fr 1fr;}
@@ -510,36 +562,6 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 </div>
 
 <!-- ============================================================
-   MODAL EDIT LISENSI
-   ============================================================ -->
-<div class="modal-overlay" id="editLicenseModal">
-  <div class="modal-box" style="max-width:450px;">
-    <div class="modal-icon">✏️</div>
-    <h2>Edit Lisensi</h2>
-    <p style="color:var(--paper-dim);font-size:13px;" id="editLicenseEmail">—</p>
-    <div class="form-group">
-      <label>Kuota</label>
-      <input type="number" id="editQuota" min="0">
-    </div>
-    <div class="form-group">
-      <label>Tanggal Expired</label>
-      <input type="date" id="editExpiry">
-    </div>
-    <div class="form-group">
-      <label>Status</label>
-      <select id="editStatus">
-        <option value="true">✅ Aktif</option>
-        <option value="false">❌ Tidak Aktif</option>
-      </select>
-    </div>
-    <div class="modal-btns">
-      <button class="btn btn-primary" id="saveLicenseBtn">💾 Simpan</button>
-      <button class="btn btn-outline" id="closeEditLicenseBtn">Batal</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
    JAVASCRIPT - FIREBASE
    ============================================================ -->
 <script type="importmap">
@@ -576,7 +598,7 @@ import {
 } from 'firebase/firestore';
 
 // ============================================================
-// FIREBASE CONFIG - GANTI DENGAN MILIK ANDA!
+// FIREBASE CONFIG
 // ============================================================
 const firebaseConfig = {
   apiKey: "AIzaSyDX9Rm_Wz8Ge2AiYvTMBQ4VbyQu6zI2esI",
@@ -588,18 +610,17 @@ const firebaseConfig = {
   measurementId: "G-CXEHC5EEMG"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
 // ============================================================
-// CONFIG - PIN BARU 614931
+// CONFIG
 // ============================================================
 const ADMIN_PIN = '614931';
 
 // ============================================================
-// TAB MANAGEMENT - TETAP DI TAB YANG SAMA SAAT REFRESH
+// TAB MANAGEMENT
 // ============================================================
 function getActiveTab() {
     return localStorage.getItem('admin_active_tab') || 'users';
@@ -658,9 +679,6 @@ async function getAllHistory() {
     return history.sort((a, b) => new Date(b.calculated_at) - new Date(a.calculated_at));
 }
 
-// ============================================================
-// UPDATE LICENSE - FUNGSI BARU UNTUK EDIT
-// ============================================================
 async function updateLicense(email, quota, expiryDate, isActive) {
     try {
         await updateDoc(doc(db, 'licenses', email), {
@@ -729,7 +747,6 @@ document.getElementById('pinSubmitBtn').addEventListener('click', function() {
         updateClock();
         setInterval(updateClock, 60000);
         
-        // Aktifkan tab terakhir yang dilihat
         const savedTab = getActiveTab();
         activateTab(savedTab);
     } else {
@@ -766,7 +783,7 @@ document.getElementById('adminLogoutBtn').addEventListener('click', function() {
 });
 
 // ============================================================
-// TABS - SIMPAN TAB AKTIF SAAT DIKLIK
+// TABS
 // ============================================================
 document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', function() {
@@ -780,7 +797,7 @@ document.querySelectorAll('.tab').forEach(tab => {
 // DATA STORE
 // ============================================================
 let DATA = { users: {}, licenses: {}, codes: {}, history: [] };
-let editingLicenseEmail = null;
+let editingRow = null;
 
 // ============================================================
 // LOAD DATA
@@ -915,6 +932,9 @@ function renderUsers() {
     tbody.innerHTML = html;
 }
 
+// ============================================================
+// RENDER LICENSES - DENGAN INLINE EDIT
+// ============================================================
 function renderLicenses() {
     const licenses = DATA.licenses || {};
     const search = (document.getElementById('licenseSearch').value || '').toLowerCase();
@@ -946,16 +966,50 @@ function renderLicenses() {
             statusClass = 'status-active';
         }
         
-        html += '<tr>';
+        // Cek apakah baris ini sedang di-edit
+        const isEditing = (editingRow === email);
+        
+        html += '<tr id="row-' + email.replace(/[@.]/g, '_') + '">';
         html += '<td>' + no + '</td>';
         html += '<td>' + esc(email) + '</td>';
         html += '<td style="font-family:Cormorant Garamond,serif;color:var(--gold-soft);">' + esc(lic.key || '-') + '</td>';
-        html += '<td>' + lic.quota + '</td>';
+        
+        // Kolom Kuota - editable atau teks
+        if (isEditing) {
+            html += '<td><input class="inline-input" type="number" id="editQuota_' + email.replace(/[@.]/g, '_') + '" value="' + lic.quota + '" min="0" style="max-width:70px;"></td>';
+        } else {
+            html += '<td>' + lic.quota + '</td>';
+        }
+        
         html += '<td>' + lic.used_count + '</td>';
         html += '<td>' + remaining + '</td>';
-        html += '<td>' + lic.expiry_date + '</td>';
-        html += '<td class="' + statusClass + '">' + statusText + '</td>';
-        html += '<td><button class="edit-btn" data-email="' + esc(email) + '">✏️ Edit</button></td>';
+        
+        // Kolom Expired - editable atau teks
+        if (isEditing) {
+            html += '<td><input class="inline-date" type="date" id="editExpiry_' + email.replace(/[@.]/g, '_') + '" value="' + lic.expiry_date + '" style="max-width:130px;"></td>';
+        } else {
+            html += '<td>' + lic.expiry_date + '</td>';
+        }
+        
+        // Kolom Status - editable atau teks
+        if (isEditing) {
+            html += '<td><select class="inline-select" id="editStatus_' + email.replace(/[@.]/g, '_') + '" style="max-width:110px;">';
+            html += '<option value="true"' + (lic.is_active ? ' selected' : '') + '>✅ Aktif</option>';
+            html += '<option value="false"' + (!lic.is_active ? ' selected' : '') + '>❌ Tidak Aktif</option>';
+            html += '</select></td>';
+        } else {
+            html += '<td class="' + statusClass + '">' + statusText + '</td>';
+        }
+        
+        // Kolom Aksi
+        html += '<td>';
+        if (isEditing) {
+            html += '<button class="save-btn" data-email="' + esc(email) + '">💾 Save</button> ';
+            html += '<button class="cancel-btn" data-email="' + esc(email) + '">✖️ Batal</button>';
+        } else {
+            html += '<button class="edit-btn" data-email="' + esc(email) + '">✏️ Edit</button>';
+        }
+        html += '</td>';
         html += '</tr>';
     });
     
@@ -964,10 +1018,56 @@ function renderLicenses() {
     }
     tbody.innerHTML = html;
     
+    // Event listener untuk tombol Edit
     tbody.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const email = this.dataset.email;
-            openEditLicenseModal(email);
+            editingRow = email;
+            renderLicenses();
+            renderStats();
+        });
+    });
+    
+    // Event listener untuk tombol Save
+    tbody.querySelectorAll('.save-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const email = this.dataset.email;
+            const id = email.replace(/[@.]/g, '_');
+            
+            const quota = parseInt(document.getElementById('editQuota_' + id).value);
+            const expiry = document.getElementById('editExpiry_' + id).value;
+            const status = document.getElementById('editStatus_' + id).value === 'true';
+            
+            if (isNaN(quota) || quota < 0) {
+                alert('Kuota harus angka positif.');
+                return;
+            }
+            if (!expiry) {
+                alert('Pilih tanggal expired.');
+                return;
+            }
+            
+            if (confirm('Yakin ingin menyimpan perubahan lisensi untuk ' + email + '?')) {
+                const result = await updateLicense(email, quota, expiry, status);
+                if (result) {
+                    editingRow = null;
+                    await loadData();
+                    renderAll();
+                    alert('✅ Lisensi berhasil diperbarui!');
+                } else {
+                    alert('❌ Gagal memperbarui lisensi.');
+                }
+            }
+        });
+    });
+    
+    // Event listener untuk tombol Batal
+    tbody.querySelectorAll('.cancel-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const email = this.dataset.email;
+            editingRow = null;
+            renderLicenses();
+            renderStats();
         });
     });
 }
@@ -1060,70 +1160,6 @@ function renderHistory() {
     }
     tbody.innerHTML = html;
 }
-
-// ============================================================
-// EDIT LICENSE MODAL
-// ============================================================
-function openEditLicenseModal(email) {
-    const lic = DATA.licenses[email];
-    if (!lic) {
-        alert('Lisensi tidak ditemukan.');
-        return;
-    }
-    
-    editingLicenseEmail = email;
-    document.getElementById('editLicenseEmail').textContent = '📧 ' + email;
-    document.getElementById('editQuota').value = lic.quota || 0;
-    document.getElementById('editExpiry').value = lic.expiry_date || '';
-    document.getElementById('editStatus').value = lic.is_active ? 'true' : 'false';
-    
-    document.getElementById('editLicenseModal').classList.add('show');
-}
-
-document.getElementById('closeEditLicenseBtn').addEventListener('click', function() {
-    document.getElementById('editLicenseModal').classList.remove('show');
-    editingLicenseEmail = null;
-});
-
-document.getElementById('editLicenseModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        this.classList.remove('show');
-        editingLicenseEmail = null;
-    }
-});
-
-document.getElementById('saveLicenseBtn').addEventListener('click', async function() {
-    if (!editingLicenseEmail) {
-        alert('Tidak ada lisensi yang diedit.');
-        return;
-    }
-    
-    const quota = parseInt(document.getElementById('editQuota').value);
-    const expiry = document.getElementById('editExpiry').value;
-    const status = document.getElementById('editStatus').value === 'true';
-    
-    if (isNaN(quota) || quota < 0) {
-        alert('Kuota harus angka positif.');
-        return;
-    }
-    if (!expiry) {
-        alert('Pilih tanggal expired.');
-        return;
-    }
-    
-    if (confirm('Yakin ingin menyimpan perubahan lisensi ini?')) {
-        const result = await updateLicense(editingLicenseEmail, quota, expiry, status);
-        if (result) {
-            document.getElementById('editLicenseModal').classList.remove('show');
-            editingLicenseEmail = null;
-            await loadData();
-            renderAll();
-            alert('✅ Lisensi berhasil diperbarui!');
-        } else {
-            alert('❌ Gagal memperbarui lisensi.');
-        }
-    }
-});
 
 // ============================================================
 // GENERATE TOKEN
@@ -1284,10 +1320,12 @@ function getTodayStr() { return new Date().toISOString().slice(0,10); }
 // REFRESH BUTTONS
 // ============================================================
 document.getElementById('refreshUsersBtn').addEventListener('click', async function() {
+    editingRow = null;
     await loadData();
     renderUsers();
 });
 document.getElementById('refreshLicensesBtn').addEventListener('click', async function() {
+    editingRow = null;
     await loadData();
     renderLicenses();
 });
