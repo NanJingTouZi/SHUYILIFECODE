@@ -557,12 +557,30 @@ function loadData() {
 }
 
 // ============================================================
+// CEK SESSION ADMIN DI LOCALSTORAGE
+// ============================================================
+function checkAdminSession() {
+    const session = localStorage.getItem('admin_session');
+    if (session === 'true') {
+        document.getElementById('pinOverlay').classList.add('hidden');
+        document.getElementById('dashboardWrap').style.display = 'block';
+        loadData();
+        renderAll();
+        updateClock();
+        setInterval(updateClock, 60000);
+        return true;
+    }
+    return false;
+}
+
+// ============================================================
 // PIN LOGIN
 // ============================================================
 document.getElementById('pinSubmitBtn').addEventListener('click', function() {
     const pin = document.getElementById('pinInput').value;
     const errEl = document.getElementById('pinErr');
     if (pin === ADMIN_PIN) {
+        localStorage.setItem('admin_session', 'true');
         document.getElementById('pinOverlay').classList.add('hidden');
         document.getElementById('dashboardWrap').style.display = 'block';
         loadData();
@@ -592,10 +610,11 @@ function updateClock() {
 }
 
 // ============================================================
-// ADMIN LOGOUT
+// ADMIN LOGOUT (HAPUS SESSION)
 // ============================================================
 document.getElementById('adminLogoutBtn').addEventListener('click', function() {
     if (confirm('Yakin ingin logout dari admin dashboard?')) {
+        localStorage.removeItem('admin_session');
         document.getElementById('pinOverlay').classList.remove('hidden');
         document.getElementById('dashboardWrap').style.display = 'none';
         document.getElementById('pinInput').value = '';
@@ -1102,8 +1121,19 @@ document.getElementById('codeFilter').addEventListener('change', renderCodes);
 document.getElementById('historySearch').addEventListener('input', renderHistory);
 
 // ============================================================
-// INIT
+// INIT - CEK SESSION ADMIN
 // ============================================================
+// Cek apakah admin sudah login sebelumnya
+const adminSession = localStorage.getItem('admin_session');
+if (adminSession === 'true') {
+    document.getElementById('pinOverlay').classList.add('hidden');
+    document.getElementById('dashboardWrap').style.display = 'block';
+    loadData();
+    renderAll();
+    updateClock();
+    setInterval(updateClock, 60000);
+}
+
 console.log('🔐 Admin Dashboard siap!');
 console.log('📌 Mode: LOCAL (data dari localStorage)');
 console.log('🔑 PIN: ' + ADMIN_PIN);
