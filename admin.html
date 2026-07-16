@@ -185,7 +185,7 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 .delete-btn:hover{background:rgba(180,72,58,0.15);}
 .edit-btn{
   background:transparent;border:1px solid var(--gold-soft);color:var(--gold-soft);
-  border-radius:4px;padding:2px 8px;font-size:11px;cursor:pointer;
+  border-radius:4px;padding:2px 10px;font-size:11px;cursor:pointer;
   transition:background .15s;
   font-family:'Inter',sans-serif;
 }
@@ -285,9 +285,7 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 </head>
 <body>
 
-<!-- ============================================================
-   PIN OVERLAY
-   ============================================================ -->
+<!-- PIN OVERLAY -->
 <div class="pin-overlay" id="pinOverlay">
   <div class="pin-box">
     <div class="icon">🔐</div>
@@ -299,9 +297,7 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
   </div>
 </div>
 
-<!-- ============================================================
-   DASHBOARD
-   ============================================================ -->
+<!-- DASHBOARD -->
 <div class="wrap" id="dashboardWrap" style="display:none;">
 
   <div class="header">
@@ -425,7 +421,6 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 
   <!-- Tab: Codes / Token -->
   <div class="tab-content" id="tab-codes">
-    <!-- Generate Section -->
     <div class="generate-section">
       <h3>🔑 Generate Token Perpanjang</h3>
       <div class="generate-form">
@@ -447,7 +442,6 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
       <div class="generate-result" id="generateResult"></div>
     </div>
 
-    <!-- Codes Table -->
     <div class="table-container">
       <div class="table-header">
         <h3>📦 Daftar Token</h3>
@@ -545,51 +539,64 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
   </div>
 </div>
 
-<script>
-// ============================================================
-// CONFIG
-// ============================================================
-const ADMIN_PIN = '614931';
+<!-- ============================================================
+   JAVASCRIPT - FIREBASE
+   ============================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"
+  }
+}
+</script>
+
+<script type="module">
+import { initializeApp } from 'firebase/app';
+import { 
+  getAuth, 
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from 'firebase/auth';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  addDoc,
+  deleteDoc as deleteFirestoreDoc
+} from 'firebase/firestore';
 
 // ============================================================
-// DATA STORE
+// FIREBASE CONFIG - GANTI DENGAN MILIK ANDA!
 // ============================================================
-const DATA = {
-    users: {},
-    licenses: {},
-    codes: {},
-    history: {}
+const firebaseConfig = {
+  apiKey: "AIzaSyDX9Rm_Wz8Ge2AiYvTMBQ4VbyQu6zI2esI",
+  authDomain: "shuyi-lifecode.firebaseapp.com",
+  projectId: "shuyi-lifecode",
+  storageBucket: "shuyi-lifecode.firebasestorage.app",
+  messagingSenderId: "386576582379",
+  appId: "1:386576582379:web:aa54c278e314361c1ee0ae",
+  measurementId: "G-CXEHC5EEMG"
 };
 
-// ============================================================
-// LOAD DATA
-// ============================================================
-function loadLocalData() {
-    const keys = ['users', 'licenses', 'codes', 'history'];
-    keys.forEach(key => {
-        const data = localStorage.getItem('local_' + key);
-        if (data) {
-            DATA[key] = JSON.parse(data);
-        } else {
-            DATA[key] = {};
-        }
-    });
-}
-
-function loadData() {
-    loadLocalData();
-    return true;
-}
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 // ============================================================
-// SAVE DATA
+// CONFIG - PIN BARU 614931
 // ============================================================
-function saveLocalData() {
-    const keys = ['users', 'licenses', 'codes', 'history'];
-    keys.forEach(key => {
-        localStorage.setItem('local_' + key, JSON.stringify(DATA[key]));
-    });
-}
+const ADMIN_PIN = '614931';
 
 // ============================================================
 // TAB MANAGEMENT - TETAP DI TAB YANG SAMA SAAT REFRESH
@@ -603,15 +610,108 @@ function setActiveTab(tab) {
 }
 
 function activateTab(tabId) {
-    // Update tabs
     document.querySelectorAll('.tab').forEach(t => {
         t.classList.toggle('active', t.dataset.tab === tabId);
     });
-    // Update content
     document.querySelectorAll('.tab-content').forEach(c => {
         c.classList.toggle('active', c.id === 'tab-' + tabId);
     });
     setActiveTab(tabId);
+}
+
+// ============================================================
+// DATA FUNCTIONS
+// ============================================================
+async function getAllUsers() {
+    const querySnapshot = await getDocs(collection(db, 'users'));
+    const users = {};
+    querySnapshot.forEach((doc) => {
+        users[doc.id] = doc.data();
+    });
+    return users;
+}
+
+async function getAllLicenses() {
+    const querySnapshot = await getDocs(collection(db, 'licenses'));
+    const licenses = {};
+    querySnapshot.forEach((doc) => {
+        licenses[doc.id] = doc.data();
+    });
+    return licenses;
+}
+
+async function getAllCodes() {
+    const querySnapshot = await getDocs(collection(db, 'codes'));
+    const codes = {};
+    querySnapshot.forEach((doc) => {
+        codes[doc.id] = doc.data();
+    });
+    return codes;
+}
+
+async function getAllHistory() {
+    const querySnapshot = await getDocs(collection(db, 'history'));
+    const history = [];
+    querySnapshot.forEach((doc) => {
+        history.push({ id: doc.id, ...doc.data() });
+    });
+    return history.sort((a, b) => new Date(b.calculated_at) - new Date(a.calculated_at));
+}
+
+// ============================================================
+// UPDATE LICENSE - FUNGSI BARU UNTUK EDIT
+// ============================================================
+async function updateLicense(email, quota, expiryDate, isActive) {
+    try {
+        await updateDoc(doc(db, 'licenses', email), {
+            quota: quota,
+            expiry_date: expiryDate,
+            is_active: isActive
+        });
+        return true;
+    } catch (error) {
+        console.error('Update license error:', error);
+        return false;
+    }
+}
+
+async function generateTokens(pin, type, count) {
+    if (pin !== ADMIN_PIN) {
+        return { success: false, message: 'PIN salah' };
+    }
+
+    const tokens = [];
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    
+    for (let i = 0; i < count; i++) {
+        const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const key = 'EXTEND-' + date + '-' + random;
+        
+        let amount = null, duration = null;
+        if (type === 'quota') {
+            amount = 10;
+        } else if (type === 'both') {
+            duration = 30;
+            amount = 10;
+        } else if (type === 'time') {
+            duration = 30;
+        } else if (type === 'time60') {
+            duration = 60;
+        }
+        
+        await setDoc(doc(db, 'codes', key), {
+            type: type,
+            amount: amount,
+            duration: duration,
+            used: false,
+            used_by: null,
+            used_at: null,
+            created_at: new Date().toISOString()
+        });
+        tokens.push(key);
+    }
+    
+    return { success: true, tokens: tokens };
 }
 
 // ============================================================
@@ -620,6 +720,7 @@ function activateTab(tabId) {
 document.getElementById('pinSubmitBtn').addEventListener('click', function() {
     const pin = document.getElementById('pinInput').value;
     const errEl = document.getElementById('pinErr');
+    
     if (pin === ADMIN_PIN) {
         document.getElementById('pinOverlay').classList.add('hidden');
         document.getElementById('dashboardWrap').style.display = 'block';
@@ -676,6 +777,29 @@ document.querySelectorAll('.tab').forEach(tab => {
 });
 
 // ============================================================
+// DATA STORE
+// ============================================================
+let DATA = { users: {}, licenses: {}, codes: {}, history: [] };
+let editingLicenseEmail = null;
+
+// ============================================================
+// LOAD DATA
+// ============================================================
+async function loadData() {
+    try {
+        DATA.users = await getAllUsers();
+        DATA.licenses = await getAllLicenses();
+        DATA.codes = await getAllCodes();
+        DATA.history = await getAllHistory();
+        console.log('✅ Data loaded from Firebase');
+        return true;
+    } catch (error) {
+        console.error('❌ Gagal load data:', error);
+        return false;
+    }
+}
+
+// ============================================================
 // RENDER FUNCTIONS
 // ============================================================
 function renderAll() {
@@ -686,21 +810,17 @@ function renderAll() {
     renderHistory();
 }
 
-// ============================================================
-// RENDER STATS
-// ============================================================
 function renderStats() {
     const users = DATA.users || {};
     const licenses = DATA.licenses || {};
     const codes = DATA.codes || {};
-    const history = DATA.history || {};
+    const history = DATA.history || [];
     
     const total = Object.keys(users).length;
     let active = 0, expired = 0, warning = 0;
-    let totalHistory = 0;
     
-    for (const key in licenses) {
-        const lic = licenses[key];
+    for (const email in licenses) {
+        const lic = licenses[email];
         if (!lic.is_active) {
             expired++;
         } else {
@@ -714,10 +834,6 @@ function renderStats() {
         }
     }
     
-    for (const email in history) {
-        totalHistory += history[email].length;
-    }
-    
     const availableCodes = Object.keys(codes).filter(key => !codes[key].used).length;
     
     document.getElementById('statTotal').textContent = total;
@@ -725,12 +841,9 @@ function renderStats() {
     document.getElementById('statExpired').textContent = expired;
     document.getElementById('statWarning').textContent = warning;
     document.getElementById('statCodes').textContent = availableCodes;
-    document.getElementById('statHistory').textContent = totalHistory;
+    document.getElementById('statHistory').textContent = history.length;
 }
 
-// ============================================================
-// RENDER USERS
-// ============================================================
 function renderUsers() {
     const users = DATA.users || {};
     const licenses = DATA.licenses || {};
@@ -744,7 +857,7 @@ function renderUsers() {
     
     emails.forEach(email => {
         const user = users[email];
-        const lic = getLicenseByEmail(email);
+        const lic = licenses[email] || null;
         
         if (search && !email.toLowerCase().includes(search) && !(user.name || '').toLowerCase().includes(search)) {
             return;
@@ -761,11 +874,7 @@ function renderUsers() {
             const now = new Date();
             daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
             
-            if (!lic.is_active) {
-                status = 'expired';
-                statusText = '❌ Habis';
-                statusClass = 'status-expired';
-            } else if (daysLeft < 0) {
+            if (!lic.is_active || daysLeft < 0) {
                 status = 'expired';
                 statusText = '❌ Habis';
                 statusClass = 'status-expired';
@@ -806,21 +915,18 @@ function renderUsers() {
     tbody.innerHTML = html;
 }
 
-// ============================================================
-// RENDER LICENSES (dengan tombol Edit)
-// ============================================================
 function renderLicenses() {
     const licenses = DATA.licenses || {};
     const search = (document.getElementById('licenseSearch').value || '').toLowerCase();
     const tbody = document.getElementById('licensesTableBody');
     
-    let keys = Object.keys(licenses);
+    let emails = Object.keys(licenses);
     let html = '';
     let no = 0;
     
-    keys.forEach(key => {
-        const lic = licenses[key];
-        if (search && !lic.user_email.toLowerCase().includes(search)) return;
+    emails.forEach(email => {
+        const lic = licenses[email];
+        if (search && !email.toLowerCase().includes(search)) return;
         
         no++;
         const remaining = lic.quota - lic.used_count;
@@ -842,14 +948,14 @@ function renderLicenses() {
         
         html += '<tr>';
         html += '<td>' + no + '</td>';
-        html += '<td>' + esc(lic.user_email) + '</td>';
-        html += '<td style="font-family:Cormorant Garamond,serif;color:var(--gold-soft);">' + esc(key) + '</td>';
+        html += '<td>' + esc(email) + '</td>';
+        html += '<td style="font-family:Cormorant Garamond,serif;color:var(--gold-soft);">' + esc(lic.key || '-') + '</td>';
         html += '<td>' + lic.quota + '</td>';
         html += '<td>' + lic.used_count + '</td>';
         html += '<td>' + remaining + '</td>';
         html += '<td>' + lic.expiry_date + '</td>';
         html += '<td class="' + statusClass + '">' + statusText + '</td>';
-        html += '<td><button class="edit-btn" data-email="' + esc(lic.user_email) + '" data-key="' + esc(key) + '">✏️ Edit</button></td>';
+        html += '<td><button class="edit-btn" data-email="' + esc(email) + '">✏️ Edit</button></td>';
         html += '</tr>';
     });
     
@@ -858,19 +964,14 @@ function renderLicenses() {
     }
     tbody.innerHTML = html;
     
-    // Event listener untuk tombol Edit
     tbody.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const email = this.dataset.email;
-            const key = this.dataset.key;
-            openEditLicenseModal(email, key);
+            openEditLicenseModal(email);
         });
     });
 }
 
-// ============================================================
-// RENDER CODES
-// ============================================================
 function renderCodes() {
     const codes = DATA.codes || {};
     const filter = document.getElementById('codeFilter').value;
@@ -890,7 +991,7 @@ function renderCodes() {
         const statusClass = code.used ? 'code-used' : 'code-available';
         const usedBy = code.used_by || '-';
         const usedAt = code.used_at ? new Date(code.used_at).toLocaleDateString('id-ID') : '-';
-        const created = code.created_at || '-';
+        const created = code.created_at ? new Date(code.created_at).toLocaleDateString('id-ID') : '-';
         
         let typeText = '-';
         if (code.type === 'time') typeText = '⏰ ' + (code.duration || 0) + ' hari';
@@ -930,26 +1031,15 @@ function renderCodes() {
     });
 }
 
-// ============================================================
-// RENDER HISTORY
-// ============================================================
 function renderHistory() {
-    const history = DATA.history || {};
+    const history = DATA.history || [];
     const search = (document.getElementById('historySearch').value || '').toLowerCase();
     const tbody = document.getElementById('historyTableBody');
-    
-    let allHistory = [];
-    for (const email in history) {
-        history[email].forEach(item => {
-            allHistory.push({ email: email, ...item });
-        });
-    }
-    allHistory.sort((a, b) => new Date(b.calculated_at) - new Date(a.calculated_at));
     
     let html = '';
     let no = 0;
     
-    allHistory.forEach(item => {
+    history.forEach(item => {
         if (search && !item.email.toLowerCase().includes(search) && !(item.name || '').toLowerCase().includes(search)) {
             return;
         }
@@ -974,16 +1064,14 @@ function renderHistory() {
 // ============================================================
 // EDIT LICENSE MODAL
 // ============================================================
-let editingLicenseKey = null;
-
-function openEditLicenseModal(email, key) {
-    const lic = DATA.licenses[key];
+function openEditLicenseModal(email) {
+    const lic = DATA.licenses[email];
     if (!lic) {
         alert('Lisensi tidak ditemukan.');
         return;
     }
     
-    editingLicenseKey = key;
+    editingLicenseEmail = email;
     document.getElementById('editLicenseEmail').textContent = '📧 ' + email;
     document.getElementById('editQuota').value = lic.quota || 0;
     document.getElementById('editExpiry').value = lic.expiry_date || '';
@@ -994,18 +1082,18 @@ function openEditLicenseModal(email, key) {
 
 document.getElementById('closeEditLicenseBtn').addEventListener('click', function() {
     document.getElementById('editLicenseModal').classList.remove('show');
-    editingLicenseKey = null;
+    editingLicenseEmail = null;
 });
 
 document.getElementById('editLicenseModal').addEventListener('click', function(e) {
     if (e.target === this) {
         this.classList.remove('show');
-        editingLicenseKey = null;
+        editingLicenseEmail = null;
     }
 });
 
-document.getElementById('saveLicenseBtn').addEventListener('click', function() {
-    if (!editingLicenseKey) {
+document.getElementById('saveLicenseBtn').addEventListener('click', async function() {
+    if (!editingLicenseEmail) {
         alert('Tidak ada lisensi yang diedit.');
         return;
     }
@@ -1024,52 +1112,103 @@ document.getElementById('saveLicenseBtn').addEventListener('click', function() {
     }
     
     if (confirm('Yakin ingin menyimpan perubahan lisensi ini?')) {
-        DATA.licenses[editingLicenseKey].quota = quota;
-        DATA.licenses[editingLicenseKey].expiry_date = expiry;
-        DATA.licenses[editingLicenseKey].is_active = status;
-        
-        saveLocalData();
-        document.getElementById('editLicenseModal').classList.remove('show');
-        editingLicenseKey = null;
-        renderAll();
-        alert('✅ Lisensi berhasil diperbarui!');
+        const result = await updateLicense(editingLicenseEmail, quota, expiry, status);
+        if (result) {
+            document.getElementById('editLicenseModal').classList.remove('show');
+            editingLicenseEmail = null;
+            await loadData();
+            renderAll();
+            alert('✅ Lisensi berhasil diperbarui!');
+        } else {
+            alert('❌ Gagal memperbarui lisensi.');
+        }
     }
 });
 
 // ============================================================
-// EXPORT EXCEL - DAFTAR USER
+// GENERATE TOKEN
 // ============================================================
-document.getElementById('exportExcelBtn').addEventListener('click', function() {
-    exportUsersToExcel();
+document.getElementById('generateBtn').addEventListener('click', async function() {
+    const type = document.getElementById('genType').value;
+    const count = parseInt(document.getElementById('genCount').value) || 5;
+    const resultEl = document.getElementById('generateResult');
+    const btn = this;
+    
+    btn.disabled = true;
+    btn.textContent = '⏳ Memproses...';
+    resultEl.style.display = 'none';
+    
+    try {
+        const pin = prompt('Masukkan PIN Admin:');
+        if (!pin) {
+            btn.disabled = false;
+            btn.textContent = '🚀 Generate Token';
+            return;
+        }
+        
+        const result = await generateTokens(pin, type, count);
+        
+        if (!result.success) {
+            alert('❌ ' + result.message);
+            btn.disabled = false;
+            btn.textContent = '🚀 Generate Token';
+            return;
+        }
+        
+        await loadData();
+        renderAll();
+        
+        resultEl.style.display = 'flex';
+        let html = '';
+        result.tokens.forEach(key => {
+            html += '<span class="code-chip">' + esc(key) + ' <button class="copy-btn" data-code="' + esc(key) + '">📋</button></span>';
+        });
+        html += '<span style="color:var(--jade-soft);font-size:12px;margin-left:8px;">✅ ' + count + ' token berhasil dibuat di Firebase!</span>';
+        resultEl.innerHTML = html;
+        
+        resultEl.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const code = this.dataset.code;
+                navigator.clipboard.writeText(code).then(() => {
+                    this.textContent = '✅';
+                    setTimeout(() => { this.textContent = '📋'; }, 2000);
+                });
+            });
+        });
+        
+        alert('✅ ' + count + ' token berhasil dibuat!');
+        
+    } catch (error) {
+        console.error('❌ Gagal membuat token:', error);
+        alert('❌ Gagal membuat token: ' + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '🚀 Generate Token';
+    }
 });
 
-function exportUsersToExcel() {
+// ============================================================
+// EXPORT FUNCTIONS
+// ============================================================
+document.getElementById('exportExcelBtn').addEventListener('click', function() {
     const users = DATA.users || {};
     const licenses = DATA.licenses || {};
     
-    let rows = [];
+    let rows = [['No', 'Nama', 'Email', 'No HP', 'Tanggal Registrasi', 'Status Lisensi', 'Sisa Kuota', 'Expired']];
     let no = 1;
-    
-    rows.push(['No', 'Nama', 'Email', 'No HP', 'Tanggal Registrasi', 'Status Lisensi', 'Sisa Kuota', 'Expired']);
     
     for (const email in users) {
         const user = users[email];
-        let userLicense = null;
-        for (const key in licenses) {
-            if (licenses[key].user_email === email) {
-                userLicense = licenses[key];
-                break;
-            }
-        }
+        const lic = licenses[email] || null;
         
         let statusText = 'Tidak ada lisensi';
         let remaining = '-';
         let expiry = '-';
         
-        if (userLicense) {
-            if (userLicense.is_active) {
-                const remainingCount = userLicense.quota - userLicense.used_count;
-                const expiryDate = new Date(userLicense.expiry_date);
+        if (lic) {
+            if (lic.is_active) {
+                const remainingCount = lic.quota - lic.used_count;
+                const expiryDate = new Date(lic.expiry_date);
                 const now = new Date();
                 const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
                 
@@ -1080,8 +1219,8 @@ function exportUsersToExcel() {
                 } else {
                     statusText = '✅ Aktif';
                 }
-                remaining = remainingCount + '/' + userLicense.quota;
-                expiry = userLicense.expiry_date || '-';
+                remaining = remainingCount + '/' + lic.quota;
+                expiry = lic.expiry_date || '-';
             } else {
                 statusText = '❌ Tidak Aktif';
             }
@@ -1115,93 +1254,16 @@ function exportUsersToExcel() {
     URL.revokeObjectURL(url);
     
     alert('✅ Data user berhasil diexport!');
-}
-
-function getTodayStr() {
-    return new Date().toISOString().slice(0,10);
-}
-
-// ============================================================
-// GENERATE CODES - UPDATED DENGAN URUTAN BARU
-// ============================================================
-document.getElementById('generateBtn').addEventListener('click', function() {
-    const type = document.getElementById('genType').value;
-    const count = parseInt(document.getElementById('genCount').value) || 5;
-    const resultEl = document.getElementById('generateResult');
-    const btn = this;
-    
-    btn.disabled = true;
-    btn.textContent = '⏳ Memproses...';
-    
-    let newCodes = [];
-    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    
-    for (let i = 0; i < count; i++) {
-        const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-        const key = 'EXTEND-' + date + '-' + random;
-        
-        let codeData = { used: false, used_by: null, used_at: null, created_at: getTodayStr() };
-        
-        if (type === 'quota') {
-            codeData.type = 'quota';
-            codeData.duration = null;
-            codeData.amount = 10;
-        } else if (type === 'both') {
-            codeData.type = 'both';
-            codeData.duration = 30;
-            codeData.amount = 10;
-        } else if (type === 'time') {
-            codeData.type = 'time';
-            codeData.duration = 30;
-            codeData.amount = null;
-        } else if (type === 'time60') {
-            codeData.type = 'time';
-            codeData.duration = 60;
-            codeData.amount = null;
-        }
-        
-        DATA.codes[key] = codeData;
-        newCodes.push(key);
-    }
-    
-    saveLocalData();
-    
-    resultEl.style.display = 'flex';
-    let html = '';
-    newCodes.forEach(key => {
-        html += '<span class="code-chip">' + esc(key) + ' <button class="copy-btn" data-code="' + esc(key) + '">📋</button></span>';
-    });
-    html += '<span style="color:var(--jade-soft);font-size:12px;margin-left:8px;">✅ ' + count + ' token berhasil dibuat!</span>';
-    resultEl.innerHTML = html;
-    
-    resultEl.querySelectorAll('.copy-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const code = this.dataset.code;
-            navigator.clipboard.writeText(code).then(() => {
-                this.textContent = '✅';
-                setTimeout(() => { this.textContent = '📋'; }, 2000);
-            });
-        });
-    });
-    
-    btn.disabled = false;
-    btn.textContent = '🚀 Generate Token';
-    renderAll();
 });
 
-// ============================================================
-// EXPORT HISTORY
-// ============================================================
 document.getElementById('exportHistoryBtn').addEventListener('click', function() {
-    const history = DATA.history || {};
+    const history = DATA.history || [];
     let csv = 'User,Name,DOB,Date\n';
-    for (const email in history) {
-        history[email].forEach(item => {
-            const date = new Date(item.calculated_at);
-            const dateStr = date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
-            csv += email + ',' + (item.name || '') + ',' + (item.dob || '') + ',' + dateStr + '\n';
-        });
-    }
+    history.forEach(item => {
+        const date = new Date(item.calculated_at);
+        const dateStr = date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+        csv += (item.email || '') + ',' + (item.name || '') + ',' + (item.dob || '') + ',' + dateStr + '\n';
+    });
     
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -1216,24 +1278,27 @@ document.getElementById('exportHistoryBtn').addEventListener('click', function()
 // HELPER FUNCTIONS
 // ============================================================
 function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function getLicenseByEmail(email) {
-    const licenses = DATA.licenses || {};
-    for (const key in licenses) {
-        if (licenses[key].user_email === email) {
-            return licenses[key];
-        }
-    }
-    return null;
-}
+function getTodayStr() { return new Date().toISOString().slice(0,10); }
 
 // ============================================================
 // REFRESH BUTTONS
 // ============================================================
-document.getElementById('refreshUsersBtn').addEventListener('click', function() { renderUsers(); });
-document.getElementById('refreshLicensesBtn').addEventListener('click', function() { renderLicenses(); });
-document.getElementById('refreshCodesBtn').addEventListener('click', function() { renderCodes(); });
-document.getElementById('refreshHistoryBtn').addEventListener('click', function() { renderHistory(); });
+document.getElementById('refreshUsersBtn').addEventListener('click', async function() {
+    await loadData();
+    renderUsers();
+});
+document.getElementById('refreshLicensesBtn').addEventListener('click', async function() {
+    await loadData();
+    renderLicenses();
+});
+document.getElementById('refreshCodesBtn').addEventListener('click', async function() {
+    await loadData();
+    renderCodes();
+});
+document.getElementById('refreshHistoryBtn').addEventListener('click', async function() {
+    await loadData();
+    renderHistory();
+});
 
 // Search & Filter
 document.getElementById('userSearch').addEventListener('input', renderUsers);
@@ -1243,10 +1308,19 @@ document.getElementById('codeFilter').addEventListener('change', renderCodes);
 document.getElementById('historySearch').addEventListener('input', renderHistory);
 
 // ============================================================
+// AUTH STATE OBSERVER
+// ============================================================
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log('✅ Admin logged in:', user.email);
+    }
+});
+
+// ============================================================
 // INIT
 // ============================================================
 console.log('🔐 Admin Dashboard siap!');
-console.log('📌 Mode: LOCAL (data dari localStorage)');
+console.log('📌 Mode: FIREBASE');
 console.log('🔑 PIN: ' + ADMIN_PIN);
 </script>
 </body>
