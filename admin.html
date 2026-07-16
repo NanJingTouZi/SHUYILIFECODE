@@ -55,13 +55,14 @@ body{
 .header .logout-btn:hover{background:rgba(180,72,58,0.15);}
 
 .pin-overlay{
-  display:flex;
+  display:none;
   position:fixed;top:0;left:0;right:0;bottom:0;
   background:rgba(0,0,0,0.85);
   z-index:1000;
   justify-content:center;align-items:center;
   backdrop-filter:blur(4px);
 }
+.pin-overlay.show{display:flex;}
 .pin-overlay.hidden{display:none;}
 .pin-box{
   background:linear-gradient(180deg,var(--panel),var(--panel-2));
@@ -183,8 +184,6 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
   transition:background .15s;
 }
 .delete-btn:hover{background:rgba(180,72,58,0.15);}
-
-/* INLINE EDIT BUTTONS */
 .edit-btn, .save-btn, .cancel-btn{
   background:transparent;border:none;
   border-radius:4px;padding:2px 10px;font-size:11px;cursor:pointer;
@@ -202,6 +201,12 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
   border:1px solid var(--paper-dim);color:var(--paper-dim);
 }
 .cancel-btn:hover{background:rgba(201,162,74,0.05);}
+.delete-btn-table{
+  background:transparent;border:1px solid var(--cinnabar);color:#e0968a;
+  border-radius:4px;padding:2px 10px;font-size:11px;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:background .15s;
+}
+.delete-btn-table:hover{background:rgba(180,72,58,0.15);}
 
 .inline-input{
   background:rgba(0,0,0,0.25);
@@ -319,6 +324,95 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 .tab-content{display:none;}
 .tab-content.active{display:block;}
 
+/* CUSTOM POPUP MODAL */
+.custom-popup-overlay{
+  display:none;
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.85);
+  z-index:2000;
+  justify-content:center;
+  align-items:center;
+  backdrop-filter:blur(6px);
+}
+.custom-popup-overlay.show{display:flex;}
+.custom-popup-overlay .popup-box{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:36px 40px 32px;
+  max-width:420px;
+  width:90%;
+  box-shadow:0 30px 80px rgba(0,0,0,0.6);
+  animation:popupIn .3s ease;
+  text-align:center;
+}
+@keyframes popupIn{
+  from{transform:scale(0.9) translateY(20px);opacity:0;}
+  to{transform:scale(1) translateY(0);opacity:1;}
+}
+.custom-popup-overlay .popup-icon{font-size:52px;margin-bottom:6px;}
+.custom-popup-overlay .popup-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;
+  color:var(--gold-soft);
+  margin:0 0 6px;
+  font-weight:600;
+}
+.custom-popup-overlay .popup-message{
+  color:var(--paper-dim);
+  font-size:15px;
+  margin:0 0 20px;
+  line-height:1.6;
+}
+.custom-popup-overlay .popup-btn{
+  background:linear-gradient(135deg,var(--gold),#a9843a);
+  color:#1a1408;
+  border:none;
+  border-radius:10px;
+  padding:12px 32px;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  font-family:'Inter',sans-serif;
+  transition:transform .12s, box-shadow .12s;
+  margin:0 6px;
+}
+.custom-popup-overlay .popup-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 24px rgba(201,162,74,0.3);
+}
+.custom-popup-overlay .popup-btn-success{
+  background:linear-gradient(135deg,var(--jade),#3d705a);
+  color:#fff;
+}
+.custom-popup-overlay .popup-btn-success:hover{
+  box-shadow:0 8px 20px rgba(79,138,114,0.4);
+}
+.custom-popup-overlay .popup-btn-danger{
+  background:linear-gradient(135deg,var(--cinnabar),#8a3a2e);
+  color:#fff;
+}
+.custom-popup-overlay .popup-btn-danger:hover{
+  box-shadow:0 8px 20px rgba(180,72,58,0.4);
+}
+.custom-popup-overlay .popup-btn-cancel{
+  background:transparent !important;
+  border:1px solid var(--paper-dim) !important;
+  color:var(--paper-dim) !important;
+}
+.custom-popup-overlay .popup-btn-cancel:hover{
+  background:rgba(201,162,74,0.1) !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+.popup-btns{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
 @media (max-width:768px){
   .generate-form{flex-direction:column;align-items:stretch;}
   .generate-form .form-group{min-width:auto;}
@@ -338,7 +432,7 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
 <body>
 
 <!-- PIN OVERLAY -->
-<div class="pin-overlay" id="pinOverlay">
+<div class="pin-overlay show" id="pinOverlay">
   <div class="pin-box">
     <div class="icon">🔐</div>
     <h2>Admin Access</h2>
@@ -346,6 +440,18 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
     <input type="password" id="pinInput" placeholder="••••••" maxlength="6" inputmode="numeric">
     <button class="btn" id="pinSubmitBtn">Masuk</button>
     <div class="err" id="pinErr">PIN salah. Silakan coba lagi.</div>
+  </div>
+</div>
+
+<!-- CUSTOM POPUP -->
+<div class="custom-popup-overlay" id="customPopup">
+  <div class="popup-box">
+    <div class="popup-icon" id="popupIcon">ℹ️</div>
+    <h3 class="popup-title" id="popupTitle">Informasi</h3>
+    <p class="popup-message" id="popupMessage">Pesan</p>
+    <div class="popup-btns" id="popupButtons">
+      <button class="popup-btn" id="popupBtnConfirm">OK</button>
+    </div>
   </div>
 </div>
 
@@ -428,10 +534,11 @@ table .code-available{color:var(--jade-soft);font-weight:600;}
               <th>Status Lisensi</th>
               <th>Sisa Kuota</th>
               <th>Hari Tersisa</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody id="usersTableBody">
-            <tr><td colspan="8" style="text-align:center;color:var(--paper-dim);padding:30px;">Memuat data...</td></tr>
+            <tr><td colspan="9" style="text-align:center;color:var(--paper-dim);padding:30px;">Memuat data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -620,6 +727,72 @@ const db = getFirestore(app);
 const ADMIN_PIN = '614931';
 
 // ============================================================
+// CUSTOM POPUP (Pengganti alert/confirm)
+// ============================================================
+function showPopup(type, title, message, confirmText, cancelText, callback) {
+    return new Promise((resolve) => {
+        const overlay = document.getElementById('customPopup');
+        const icon = document.getElementById('popupIcon');
+        const titleEl = document.getElementById('popupTitle');
+        const msgEl = document.getElementById('popupMessage');
+        const btnContainer = document.getElementById('popupButtons');
+        
+        const icons = {
+            'success': '✅',
+            'error': '❌',
+            'warning': '⚠️',
+            'info': 'ℹ️',
+            'confirm': '❓'
+        };
+        
+        icon.textContent = icons[type] || 'ℹ️';
+        titleEl.textContent = title || 'Informasi';
+        msgEl.textContent = message || '';
+        
+        btnContainer.innerHTML = '';
+        
+        if (type === 'confirm') {
+            // Confirm: 2 tombol
+            const btnYes = document.createElement('button');
+            btnYes.textContent = confirmText || 'Ya';
+            btnYes.className = 'popup-btn popup-btn-danger';
+            btnYes.onclick = function() {
+                overlay.classList.remove('show');
+                resolve(true);
+                if (callback) callback(true);
+            };
+            
+            const btnNo = document.createElement('button');
+            btnNo.textContent = cancelText || 'Batal';
+            btnNo.className = 'popup-btn popup-btn-cancel';
+            btnNo.onclick = function() {
+                overlay.classList.remove('show');
+                resolve(false);
+                if (callback) callback(false);
+            };
+            
+            btnContainer.appendChild(btnYes);
+            btnContainer.appendChild(btnNo);
+        } else {
+            // Alert: 1 tombol
+            const btn = document.createElement('button');
+            btn.textContent = 'OK';
+            btn.className = 'popup-btn';
+            if (type === 'success') btn.classList.add('popup-btn-success');
+            else if (type === 'error') btn.classList.add('popup-btn-danger');
+            
+            btn.onclick = function() {
+                overlay.classList.remove('show');
+                resolve(true);
+            };
+            btnContainer.appendChild(btn);
+        }
+        
+        overlay.classList.add('show');
+    });
+}
+
+// ============================================================
 // TAB MANAGEMENT
 // ============================================================
 function getActiveTab() {
@@ -638,6 +811,25 @@ function activateTab(tabId) {
         c.classList.toggle('active', c.id === 'tab-' + tabId);
     });
     setActiveTab(tabId);
+}
+
+// ============================================================
+// SESSION MANAGEMENT (TETAP LOGIN SAAT REFRESH)
+// ============================================================
+function getAdminSession() {
+    const data = localStorage.getItem('admin_session');
+    return data ? JSON.parse(data) : null;
+}
+
+function setAdminSession(pin) {
+    localStorage.setItem('admin_session', JSON.stringify({ 
+        pin: pin, 
+        login_at: new Date().toISOString() 
+    }));
+}
+
+function clearAdminSession() {
+    localStorage.removeItem('admin_session');
 }
 
 // ============================================================
@@ -693,6 +885,31 @@ async function updateLicense(email, quota, expiryDate, isActive) {
     }
 }
 
+async function deleteUser(email) {
+    try {
+        // 1. Hapus user dari collection 'users'
+        await deleteDoc(doc(db, 'users', email));
+        
+        // 2. Hapus license dari collection 'licenses'
+        await deleteDoc(doc(db, 'licenses', email));
+        
+        // 3. Hapus semua history user
+        const historySnapshot = await getDocs(
+            query(collection(db, 'history'), where('email', '==', email))
+        );
+        const batch = db.batch();
+        historySnapshot.forEach((doc) => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+        
+        return true;
+    } catch (error) {
+        console.error('Delete user error:', error);
+        return false;
+    }
+}
+
 async function generateTokens(pin, type, count) {
     if (pin !== ADMIN_PIN) {
         return { success: false, message: 'PIN salah' };
@@ -735,14 +952,16 @@ async function generateTokens(pin, type, count) {
 // ============================================================
 // PIN LOGIN
 // ============================================================
-document.getElementById('pinSubmitBtn').addEventListener('click', function() {
+document.getElementById('pinSubmitBtn').addEventListener('click', async function() {
     const pin = document.getElementById('pinInput').value;
     const errEl = document.getElementById('pinErr');
     
     if (pin === ADMIN_PIN) {
+        setAdminSession(pin);
+        document.getElementById('pinOverlay').classList.remove('show');
         document.getElementById('pinOverlay').classList.add('hidden');
         document.getElementById('dashboardWrap').style.display = 'block';
-        loadData();
+        await loadData();
         renderAll();
         updateClock();
         setInterval(updateClock, 60000);
@@ -764,6 +983,27 @@ document.getElementById('pinInput').addEventListener('keydown', function(e) {
 });
 
 // ============================================================
+// CHECK SESSION SAAT LOAD
+// ============================================================
+async function checkAdminSession() {
+    const session = getAdminSession();
+    if (session && session.pin === ADMIN_PIN) {
+        document.getElementById('pinOverlay').classList.remove('show');
+        document.getElementById('pinOverlay').classList.add('hidden');
+        document.getElementById('dashboardWrap').style.display = 'block';
+        await loadData();
+        renderAll();
+        updateClock();
+        setInterval(updateClock, 60000);
+        
+        const savedTab = getActiveTab();
+        activateTab(savedTab);
+        return true;
+    }
+    return false;
+}
+
+// ============================================================
 // CLOCK
 // ============================================================
 function updateClock() {
@@ -774,9 +1014,12 @@ function updateClock() {
 // ============================================================
 // ADMIN LOGOUT
 // ============================================================
-document.getElementById('adminLogoutBtn').addEventListener('click', function() {
-    if (confirm('Yakin ingin logout dari admin dashboard?')) {
+document.getElementById('adminLogoutBtn').addEventListener('click', async function() {
+    const result = await showPopup('confirm', 'Konfirmasi Logout', 'Yakin ingin logout dari admin dashboard?', 'Logout', 'Batal');
+    if (result) {
+        clearAdminSession();
         document.getElementById('pinOverlay').classList.remove('hidden');
+        document.getElementById('pinOverlay').classList.add('show');
         document.getElementById('dashboardWrap').style.display = 'none';
         document.getElementById('pinInput').value = '';
     }
@@ -861,6 +1104,9 @@ function renderStats() {
     document.getElementById('statHistory').textContent = history.length;
 }
 
+// ============================================================
+// RENDER USERS - DENGAN TOMBOL DELETE
+// ============================================================
 function renderUsers() {
     const users = DATA.users || {};
     const licenses = DATA.licenses || {};
@@ -923,13 +1169,38 @@ function renderUsers() {
         html += '<td class="' + statusClass + '">' + statusText + '</td>';
         html += '<td>' + remaining + '/' + quota + '</td>';
         html += '<td>' + (daysLeft !== '-' ? daysLeft : '-') + '</td>';
+        html += '<td><button class="delete-btn-table" data-email="' + esc(email) + '">🗑️ Hapus</button></td>';
         html += '</tr>';
     });
     
     if (no === 0) {
-        html = '<tr><td colspan="8" style="text-align:center;color:var(--paper-dim);padding:30px;">Tidak ada data.</td></tr>';
+        html = '<tr><td colspan="9" style="text-align:center;color:var(--paper-dim);padding:30px;">Tidak ada data.</td></tr>';
     }
     tbody.innerHTML = html;
+    
+    // Event listener untuk tombol Delete
+    tbody.querySelectorAll('.delete-btn-table').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const email = this.dataset.email;
+            const user = DATA.users[email];
+            const name = user ? user.name : email;
+            
+            const confirmDelete = await showPopup('confirm', '⚠️ Hapus User', 
+                'Yakin ingin menghapus user <strong>' + esc(name) + '</strong> (' + esc(email) + ')?<br><br>Semua data (lisensi & riwayat) akan dihapus permanen.', 
+                'Hapus', 'Batal');
+            
+            if (confirmDelete) {
+                const result = await deleteUser(email);
+                if (result) {
+                    await loadData();
+                    renderAll();
+                    await showPopup('success', 'Berhasil', 'User <strong>' + esc(name) + '</strong> berhasil dihapus.');
+                } else {
+                    await showPopup('error', 'Gagal', 'Gagal menghapus user.');
+                }
+            }
+        });
+    });
 }
 
 // ============================================================
@@ -966,7 +1237,6 @@ function renderLicenses() {
             statusClass = 'status-active';
         }
         
-        // Cek apakah baris ini sedang di-edit
         const isEditing = (editingRow === email);
         
         html += '<tr id="row-' + email.replace(/[@.]/g, '_') + '">';
@@ -974,7 +1244,6 @@ function renderLicenses() {
         html += '<td>' + esc(email) + '</td>';
         html += '<td style="font-family:Cormorant Garamond,serif;color:var(--gold-soft);">' + esc(lic.key || '-') + '</td>';
         
-        // Kolom Kuota - editable atau teks
         if (isEditing) {
             html += '<td><input class="inline-input" type="number" id="editQuota_' + email.replace(/[@.]/g, '_') + '" value="' + lic.quota + '" min="0" style="max-width:70px;"></td>';
         } else {
@@ -984,14 +1253,12 @@ function renderLicenses() {
         html += '<td>' + lic.used_count + '</td>';
         html += '<td>' + remaining + '</td>';
         
-        // Kolom Expired - editable atau teks
         if (isEditing) {
             html += '<td><input class="inline-date" type="date" id="editExpiry_' + email.replace(/[@.]/g, '_') + '" value="' + lic.expiry_date + '" style="max-width:130px;"></td>';
         } else {
             html += '<td>' + lic.expiry_date + '</td>';
         }
         
-        // Kolom Status - editable atau teks
         if (isEditing) {
             html += '<td><select class="inline-select" id="editStatus_' + email.replace(/[@.]/g, '_') + '" style="max-width:110px;">';
             html += '<option value="true"' + (lic.is_active ? ' selected' : '') + '>✅ Aktif</option>';
@@ -1001,7 +1268,6 @@ function renderLicenses() {
             html += '<td class="' + statusClass + '">' + statusText + '</td>';
         }
         
-        // Kolom Aksi
         html += '<td>';
         if (isEditing) {
             html += '<button class="save-btn" data-email="' + esc(email) + '">💾 Save</button> ';
@@ -1018,7 +1284,6 @@ function renderLicenses() {
     }
     tbody.innerHTML = html;
     
-    // Event listener untuk tombol Edit
     tbody.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const email = this.dataset.email;
@@ -1028,7 +1293,6 @@ function renderLicenses() {
         });
     });
     
-    // Event listener untuk tombol Save
     tbody.querySelectorAll('.save-btn').forEach(btn => {
         btn.addEventListener('click', async function() {
             const email = this.dataset.email;
@@ -1039,29 +1303,31 @@ function renderLicenses() {
             const status = document.getElementById('editStatus_' + id).value === 'true';
             
             if (isNaN(quota) || quota < 0) {
-                alert('Kuota harus angka positif.');
+                await showPopup('warning', 'Peringatan', 'Kuota harus angka positif.');
                 return;
             }
             if (!expiry) {
-                alert('Pilih tanggal expired.');
+                await showPopup('warning', 'Peringatan', 'Pilih tanggal expired.');
                 return;
             }
             
-            if (confirm('Yakin ingin menyimpan perubahan lisensi untuk ' + email + '?')) {
+            const confirmSave = await showPopup('confirm', 'Simpan Perubahan', 
+                'Yakin ingin menyimpan perubahan lisensi untuk ' + email + '?', 'Simpan', 'Batal');
+            
+            if (confirmSave) {
                 const result = await updateLicense(email, quota, expiry, status);
                 if (result) {
                     editingRow = null;
                     await loadData();
                     renderAll();
-                    alert('✅ Lisensi berhasil diperbarui!');
+                    await showPopup('success', 'Berhasil', 'Lisensi berhasil diperbarui!');
                 } else {
-                    alert('❌ Gagal memperbarui lisensi.');
+                    await showPopup('error', 'Gagal', 'Gagal memperbarui lisensi.');
                 }
             }
         });
     });
     
-    // Event listener untuk tombol Batal
     tbody.querySelectorAll('.cancel-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const email = this.dataset.email;
@@ -1185,7 +1451,7 @@ document.getElementById('generateBtn').addEventListener('click', async function(
         const result = await generateTokens(pin, type, count);
         
         if (!result.success) {
-            alert('❌ ' + result.message);
+            await showPopup('error', 'Gagal', result.message);
             btn.disabled = false;
             btn.textContent = '🚀 Generate Token';
             return;
@@ -1212,11 +1478,11 @@ document.getElementById('generateBtn').addEventListener('click', async function(
             });
         });
         
-        alert('✅ ' + count + ' token berhasil dibuat!');
+        await showPopup('success', 'Berhasil', count + ' token berhasil dibuat!');
         
     } catch (error) {
         console.error('❌ Gagal membuat token:', error);
-        alert('❌ Gagal membuat token: ' + error.message);
+        await showPopup('error', 'Gagal', 'Gagal membuat token: ' + error.message);
     } finally {
         btn.disabled = false;
         btn.textContent = '🚀 Generate Token';
@@ -1289,7 +1555,7 @@ document.getElementById('exportExcelBtn').addEventListener('click', function() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     
-    alert('✅ Data user berhasil diexport!');
+    showPopup('success', 'Berhasil', 'Data user berhasil diexport!');
 });
 
 document.getElementById('exportHistoryBtn').addEventListener('click', function() {
@@ -1355,11 +1621,15 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // ============================================================
-// INIT
+// INIT - CHECK SESSION
 // ============================================================
 console.log('🔐 Admin Dashboard siap!');
 console.log('📌 Mode: FIREBASE');
 console.log('🔑 PIN: ' + ADMIN_PIN);
+console.log('💡 Session tersimpan, refresh tidak logout!');
+
+// Cek session saat load
+checkAdminSession();
 </script>
 </body>
 </html>
