@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
-   CSS (LENGKAP SAMA PERSIS DENGAN SEBELUMNYA)
+   CSS LENGKAP (sama seperti sebelumnya, dimasukkan semua)
    ============================================================ */
 :root{
   --ink:#12181a;
@@ -41,7 +41,6 @@ body{
   line-height:1.5;
 }
 .wrap{max-width:1000px;margin:0 auto;padding:56px 22px 100px;}
-
 .hero{position:relative;text-align:center;margin-bottom:52px;padding-bottom:34px;border-bottom:1px solid var(--line);}
 .hero .seal{
   font-family:'Noto Serif SC',serif;
@@ -66,7 +65,6 @@ body{
   font-size:13px;color:var(--jade-soft);
   letter-spacing:0.3em;margin-top:14px;opacity:0.7;
 }
-
 .card{
   background:linear-gradient(180deg,var(--panel),var(--panel-2));
   border:1px solid var(--line);
@@ -91,7 +89,6 @@ input[type="text"], input[type="email"], input[type="tel"]{
 }
 input::placeholder{color:rgba(243,237,224,0.35);}
 input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,74,0.15);}
-
 .date-group{display:flex;gap:10px;align-items:center;}
 .date-group .date-part{flex:1;text-align:center;}
 .date-group .date-part input{
@@ -122,7 +119,6 @@ input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,74,0.15);
   margin-top:4px;
   letter-spacing:0.04em;
 }
-
 .btn-group{display:flex;gap:14px;margin-top:26px;flex-wrap:wrap;}
 .btn{
   flex:1;min-width:140px;
@@ -152,7 +148,6 @@ input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,74,0.15);
 .btn-block{width:100%;}
 .err{color:var(--cinnabar);font-size:13.5px;margin-top:10px;display:none;}
 .success{color:var(--jade-soft);font-size:13.5px;margin-top:10px;display:none;}
-
 .modal-overlay{
   display:none;
   position:fixed;
@@ -207,7 +202,6 @@ input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,74,0.15);
 }
 .modal-btns .btn-save{background:linear-gradient(135deg,var(--jade),#3d705a);color:#fff;}
 .modal-btns .btn-skip{background:transparent;border:1px solid var(--paper-dim);color:var(--paper-dim);}
-
 .otp-container{display:flex;gap:12px;justify-content:center;margin:16px 0;}
 .otp-container input{
   width:48px;height:56px;text-align:center;font-size:24px;font-weight:700;
@@ -218,7 +212,6 @@ input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,74,0.15);
 }
 .otp-container input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,74,0.15);}
 .otp-container input::placeholder{color:rgba(243,237,224,0.2);}
-
 #results{display:none;}
 .section-title{
   font-family:'Cormorant Garamond',serif;
@@ -227,7 +220,6 @@ input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,74,0.15);
 }
 .section-title .cn{font-family:'Noto Serif SC',serif;font-size:16px;color:var(--jade-soft);opacity:0.8;letter-spacing:0.1em;}
 .section-sub{color:var(--paper-dim);font-size:13.5px;margin-bottom:18px;}
-
 .profile-banner{
   display:flex;flex-wrap:wrap;gap:26px;align-items:center;
   background:linear-gradient(180deg,var(--panel),var(--panel-2));
@@ -242,10 +234,8 @@ input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,74,0.15);
 .shio-badge .animal{font-size:34px;line-height:1;}
 .shio-badge .label{font-family:'Noto Serif SC',serif;color:var(--gold-soft);font-size:14px;margin-top:4px;}
 .shio-badge .sub{color:var(--paper-dim);font-size:12px;margin-top:2px;}
-
 .grid-2{display:grid;grid-template-columns:1.1fr 0.9fr;gap:20px;}
 @media (max-width:720px){.grid-2{grid-template-columns:1fr;}}
-
 .panel{
   background:linear-gradient(180deg,var(--panel),var(--panel-2));
   border:1px solid var(--line);border-radius:16px;padding:24px 26px;
@@ -259,7 +249,6 @@ ul.trait-list li{padding:9px 0;border-bottom:1px dashed rgba(201,162,74,0.15);fo
 ul.trait-list li:last-child{border-bottom:none;}
 .swatch{font-size:12.5px;color:var(--paper-dim);}
 .swatch b{color:var(--paper);}
-
 .main-char-highlight{
   display:flex;align-items:center;gap:18px;flex-wrap:wrap;
   background:linear-gradient(135deg,rgba(201,162,74,0.12),rgba(201,162,74,0.04));
@@ -275,10 +264,8 @@ ul.trait-list li:last-child{border-bottom:none;}
 .main-char-highlight .info .label{font-size:13px;color:var(--jade-soft);letter-spacing:0.06em;text-transform:uppercase;}
 .main-char-highlight .info .name{font-size:22px;color:var(--paper);font-weight:600;}
 .main-char-highlight .info .desc{font-size:14px;color:var(--paper-dim);}
-
 .diagram-panel{padding:12px 10px 20px;}
 .diagram-panel svg{width:100%;height:auto;display:block;}
-
 .num-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
 .num-card{
   background:linear-gradient(180deg,var(--panel),var(--panel-2));
@@ -300,7 +287,6 @@ ul.trait-list li:last-child{border-bottom:none;}
 .num-card.main-char-card{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,162,74,0.15),rgba(201,162,74,0.05));}
 .num-card.main-char-card .code{font-size:34px;color:var(--gold);}
 .num-card.main-char-card::before{color:rgba(201,162,74,0.25);}
-
 .missing-box{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
 .miss-num{
   width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
@@ -308,7 +294,6 @@ ul.trait-list li:last-child{border-bottom:none;}
   background:rgba(180,72,58,0.16);border:1px solid rgba(180,72,58,0.4);color:#e0968a;
 }
 .miss-empty{color:var(--paper-dim);font-size:13.5px;}
-
 .risk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
 .risk-card{
   border-radius:14px;padding:16px 18px;border:1px solid var(--line);
@@ -321,7 +306,6 @@ ul.trait-list li:last-child{border-bottom:none;}
 .risk-card.ok .rstatus{color:var(--jade-soft);}
 .risk-card.wealth.hit{border-color:rgba(201,162,74,0.5);background:rgba(201,162,74,0.08);}
 .risk-card.wealth.hit .rstatus{color:var(--gold-soft);}
-
 .bal-grid{
   display:grid;
   grid-template-columns: repeat(5, 1fr);
@@ -412,7 +396,6 @@ ul.trait-list li:last-child{border-bottom:none;}
   color:var(--paper-dim);
   opacity:0.5;
 }
-
 .summary-13-grid{
   display:grid;
   grid-template-columns: repeat(13, 1fr);
@@ -477,16 +460,13 @@ ul.trait-list li:last-child{border-bottom:none;}
 }
 .summary-info-row .highlight{color:var(--gold-soft);font-weight:600;}
 .summary-info-row .missing{color:#e0968a;font-weight:600;}
-
 .rel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
 @media (max-width:560px){.rel-grid{grid-template-columns:1fr;}}
 .rel-item{font-size:13.5px;color:var(--paper-dim);}
 .rel-item b{display:block;color:var(--gold-soft);font-size:12px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;font-weight:600;}
-
 .dream-box{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;}
 .dream-box .big{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--paper);flex:1;min-width:220px;}
 .dream-box .need{color:var(--jade-soft);font-size:13.5px;}
-
 .bless-list{list-style:none;margin:0;padding:0;}
 .bless-list li{padding:10px 0;border-bottom:1px dashed rgba(201,162,74,0.15);font-size:14px;display:flex;gap:10px;align-items:flex-start;}
 .bless-list li:last-child{border-bottom:none;}
@@ -496,7 +476,6 @@ ul.trait-list li:last-child{border-bottom:none;}
   display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;
   font-family:'Cormorant Garamond',serif;
 }
-
 .year-banner{
   display:flex;align-items:center;gap:20px;flex-wrap:wrap;
 }
@@ -508,7 +487,6 @@ ul.trait-list li:last-child{border-bottom:none;}
 .year-info .l1{font-size:15px;color:var(--paper);margin-bottom:4px;}
 .year-info .l2{font-size:13px;color:var(--jade-soft);margin-bottom:4px;}
 .year-info .l3{font-size:12.5px;color:var(--paper-dim);}
-
 .footnote{margin-top:60px;text-align:center;color:var(--paper-dim);font-size:12px;opacity:0.7;line-height:1.7;}
 .print-btn{
   background:transparent;border:1px solid var(--gold);color:var(--gold-soft);
@@ -518,7 +496,6 @@ ul.trait-list li:last-child{border-bottom:none;}
 }
 .print-btn:hover{background:var(--gold);color:#1a1408;}
 #print-header{display:none;}
-
 .user-status-bar{
   display:flex !important;
   flex-wrap:wrap;
@@ -571,7 +548,6 @@ ul.trait-list li:last-child{border-bottom:none;}
   transition:background .15s;
 }
 .user-status-bar .token-btn:hover{background:rgba(201,162,74,0.1);}
-
 .license-warning{
   background:rgba(180,72,58,0.12);
   border:1px solid var(--cinnabar);
@@ -590,7 +566,6 @@ ul.trait-list li:last-child{border-bottom:none;}
   transition:transform .12s;
 }
 .license-warning .wa-link:hover{transform:scale(1.02);}
-
 .history-table{width:100%;border-collapse:collapse;font-size:13px;}
 .history-table th{
   text-align:left;padding:8px 10px;color:var(--paper-dim);
@@ -616,7 +591,6 @@ ul.trait-list li:last-child{border-bottom:none;}
 .history-table .view-btn:hover{background:rgba(201,162,74,0.15);}
 .history-empty-state{text-align:center;padding:30px 0;color:var(--paper-dim);font-size:14px;}
 .history-actions{display:flex;gap:10px;margin:12px 0;flex-wrap:wrap;}
-
 #quotaModal .modal-data {
     background: rgba(0,0,0,0.2);
     border-radius: 10px;
@@ -904,7 +878,7 @@ ul.trait-list li:last-child{border-bottom:none;}
 </div>
 
 <!-- ============================================================
-   JAVASCRIPT - FIREBASE
+   JAVASCRIPT - FIREBASE (LENGKAP)
    ============================================================ -->
 <script type="importmap">
 {
@@ -937,8 +911,7 @@ import {
   where,
   getDocs,
   addDoc,
-  deleteDoc as deleteFirestoreDoc,
-  onSnapshot
+  deleteDoc as deleteFirestoreDoc
 } from 'firebase/firestore';
 
 // ============================================================
@@ -1079,7 +1052,7 @@ async function deleteAllUserHistory(email) {
 }
 
 // ============================================================
-// REDEEM TOKEN - DIPERBAIKI
+// REDEEM TOKEN
 // ============================================================
 async function redeemToken(email, token) {
     try {
@@ -1095,20 +1068,17 @@ async function redeemToken(email, token) {
             return { success: false, message: 'Token sudah digunakan.' };
         }
         
-        // Update token
         await updateDoc(docRef, {
             used: true,
             used_by: email,
             used_at: new Date().toISOString()
         });
         
-        // Get license
         const license = await getLicense(email);
         if (!license) {
             return { success: false, message: 'Lisensi tidak ditemukan.' };
         }
         
-        // Update license based on token type
         const updates = {};
         
         if (codeData.type === 'quota' || codeData.type === 'both') {
@@ -1134,7 +1104,7 @@ async function redeemToken(email, token) {
 }
 
 // ============================================================
-// FUNGSI PERHITUNGAN (LENGKAP DENGAN SEMUA DATA)
+// FUNGSI PERHITUNGAN (LENGKAP)
 // ============================================================
 function reduceDigit(n){
   n = Math.abs(Math.round(n));
@@ -1243,7 +1213,7 @@ const ELEMEN_DATA = {
   5: { nama:'TANAH', positif:['TERLAHIR SEBAGAI SEORANG PEMIMPIN DIATAS PARA PEMIMPIN','PUNYA TUJUAN&ARAH JELAS (AHLI NAVIGASI)','MUDAH MENYATUKAN ORANG','TEGAS,STRATEGIS & BERINTEGRITAS'], negatif:['OTORITER, SOMBONG','SULIT MENERIMA KRITIK & MENDENGAR','KURANG SABAR'], warna_sesuai:'KUNING, KOPI, COKLAT TUA/MUDA', warna_pendukung:'MERAH, MERAH JAMBU, UNGU, ORANGE', warna_melemahkan:'HITAM, BIRU, ABU ABU', siklus:['MENENTUKAN ARAH & KETEGUHAN','TRANSISI','KEBERUNTUNGAN TINGGI'] },
   6: { nama:'LOGAM', positif:['TERLAHIR SEBAGAI SEORANG YANG MEMILIKI INDERA KE-6 MENGENAI UANG','MAGNET UANG','KREATIF DALAM MENCARI PELUANG','PEKA & PANDAI MENGELOLA UANG'], negatif:['TERLALU MATERIALISTIS & BOROS','PEMILIH DALAM BERGAUL','TERLALU BERHITUNG & SERAKAH'], warna_sesuai:'PUTIH, EMAS, APRIKOT,PERAK', warna_pendukung:'KUNING, KOPI, COKLAT TUA/MUDA', warna_melemahkan:'HIJAU, CYAN', siklus:['MEMANEN UANG (BAGI HASIL)','KEBIJAKSANAAN (MENGERTI MEMBERI & MENERIMA)','KEBERUNTUNGAN TERMASUK TINGGI'] },
   7: { nama:'AIR', positif:['TERLAHIR SEBAGAI SEORANG YANG PALING BERUNTUNG (HAPPY GO LUCKY)','BANYAK PENDUKUNG & BERJIWA SOSIAL','BANYAK PELUANG & KONEKSI & KETRAMPILAN OBSERVASI YANG KUAT','MUDAH BERGAUL & OPTIMIS'], negatif:['MUDAH TERPENGARUH OPINI','SUKA CARI PERHATIAN','SOMBONG'], warna_sesuai:'HITAM, BIRU, ABU ABU', warna_pendukung:'PUTIH, EMAS, APRIKOT,PERAK', warna_melemahkan:'MERAH, MERAH JAMBU, UNGU, ORANGE', siklus:['MEMBANGUN RELASI','PENUH KEJUTAN','KEBERUNTUNGAN TINGGI'] },
-  8: { nama:'API', positivo:['TERLAHIR SEBAGAI SEORANG YG MEMPUNYAI SIFAT TANGGUNG JAWAB','MENGUTAMAKAN ORANG LAIN (PERHATIAN)','MEMPUNYAI ETOS KERJA','JUJUR & BERINTEGRITAS & DERMAWAN'], negatif:['KURANG BERPIKIR KE DIRI SENDIRI','STRESS&KURANG WAKTU SENDIRI','PERFEKSIONIS(SUSAH MENDELEGASI)'], warna_sesuai:'MERAH, MERAH JAMBU, UNGU, ORANGE', warna_pendukung:'HIJAU, CYAN', warna_melemahkan:'PUTIH, EMAS, APRIKOT,PERAK', siklus:['MEMBANGUN KEKUASAAN','MEMBANGUN TANGGUNG JAWAB','KEBERUNTUNGAN RENDAH'] },
+  8: { nama:'API', positif:['TERLAHIR SEBAGAI SEORANG YG MEMPUNYAI SIFAT TANGGUNG JAWAB','MENGUTAMAKAN ORANG LAIN (PERHATIAN)','MEMPUNYAI ETOS KERJA','JUJUR & BERINTEGRITAS & DERMAWAN'], negatif:['KURANG BERPIKIR KE DIRI SENDIRI','STRESS&KURANG WAKTU SENDIRI','PERFEKSIONIS(SUSAH MENDELEGASI)'], warna_sesuai:'MERAH, MERAH JAMBU, UNGU, ORANGE', warna_pendukung:'HIJAU, CYAN', warna_melemahkan:'PUTIH, EMAS, APRIKOT,PERAK', siklus:['MEMBANGUN KEKUASAAN','MEMBANGUN TANGGUNG JAWAB','KEBERUNTUNGAN RENDAH'] },
   9: { nama:'KAYU', positif:['TERLAHIR SEBAGAI SEORANG YANG VISIONER(IMAJINATIF)','KUAT DALAM PIKIRAN & KEYAKINAN (APA YANG DIPIKIRKAN AKAN MUDAH DIDAPATKAN)','KHARISMATIK & OPTIMIS (MENTAL KUAT)','INTUITIF, MUDAH & CEPAT MENARIK PELUANG'], negatif:['TIDAK KONSISTEN, EKSPEKTASI TERLALU TINGGI','MUDAH STRESS & TERSUGESTI','SULIT MENGONTROL EMOSI & PIKIRAN'], warna_sesuai:'HIJAU, CYAN', warna_pendukung:'HITAM, BIRU, ABU ABU', warna_melemahkan:'KUNING, KOPI, COKLAT TUA/MUDA', siklus:['MENIKMATI HASIL (PENUTUP)','PERSIAPAN SIKLUS BARU YANG LEBIH BAIK','KEBERUNTUNGAN TERMASUK TINGGI'] }
 };
 
@@ -1868,6 +1838,10 @@ async function updateStatusBar(user) {
         if (kuotaEl) {
             kuotaEl.textContent = status.remaining + '/' + status.quota;
             kuotaEl.className = 'val success';
+            kuotaEl.style.color = '#7fb59c';
+            kuotaEl.style.fontWeight = 'bold';
+            kuotaEl.style.fontSize = '16px';
+            kuotaEl.style.display = 'inline-block';
         }
         if (masaEl) {
             masaEl.textContent = status.daysLeft > 0 ? status.daysLeft : 0;
@@ -1883,6 +1857,10 @@ async function updateStatusBar(user) {
         if (kuotaEl) {
             kuotaEl.textContent = '0/0';
             kuotaEl.className = 'val danger';
+            kuotaEl.style.color = '#e0968a';
+            kuotaEl.style.fontWeight = 'bold';
+            kuotaEl.style.fontSize = '16px';
+            kuotaEl.style.display = 'inline-block';
         }
         if (masaEl) {
             masaEl.textContent = '0';
@@ -1963,152 +1941,225 @@ function showQuotaModal(user) {
 }
 
 // ============================================================
-// EVENT HANDLERS
+// DOM READY - Event Listeners
 // ============================================================
-
-// === LOGIN ===
-document.getElementById('loginBtnAction').addEventListener('click', async function() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
+document.addEventListener('DOMContentLoaded', function() {
     
-    if (!email || !password) {
-        alert('Masukkan email dan password.');
-        return;
-    }
-    
-    try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        hideModal();
-        alert('✅ Login berhasil!');
-    } catch (error) {
-        alert('❌ ' + error.message);
-    }
-});
-
-// === REGISTER ===
-document.getElementById('registerBtnAction').addEventListener('click', async function() {
-    const email = document.getElementById('regEmail').value.trim();
-    const password = document.getElementById('regPassword').value;
-    const name = document.getElementById('regName').value.trim();
-    const phone = document.getElementById('regPhone').value.trim();
-    
-    if (!email || !password || !name || !phone) {
-        alert('Isi semua data.');
-        return;
-    }
-    if (password.length < 6) {
-        alert('Password minimal 6 karakter.');
-        return;
-    }
-    
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await createUser(email, name, phone);
-        await createLicense(email, CONFIG.DEFAULT_QUOTA, CONFIG.DEFAULT_DAYS);
-        hideModal();
-        alert('✅ Registrasi berhasil! Anda mendapat ' + CONFIG.DEFAULT_QUOTA + ' kuota.');
-    } catch (error) {
-        alert('❌ ' + error.message);
-    }
-});
-
-// === REDEEM TOKEN ===
-document.getElementById('redeemTokenBtn').addEventListener('click', async function() {
-    const user = auth.currentUser;
-    if (!user) {
-        alert('Silakan login terlebih dahulu.');
-        return;
-    }
-    
-    const token = document.getElementById('tokenInput').value.trim();
-    if (!token) {
-        alert('Masukkan token.');
-        return;
-    }
-    
-    const btn = this;
-    btn.disabled = true;
-    btn.textContent = '⏳ Memproses...';
-    
-    try {
-        const result = await redeemToken(user.email, token);
-        btn.disabled = false;
-        btn.textContent = '🔓 Perpanjang Lisensi';
+    // === LOGIN ===
+    document.getElementById('loginBtnAction').addEventListener('click', async function() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
         
-        if (result.success) {
-            hideModal();
-            await updateStatusBar(user);
-            alert('✅ ' + result.message);
-        } else {
-            alert('❌ ' + result.message);
+        if (!email || !password) {
+            alert('Masukkan email dan password.');
+            return;
         }
-    } catch (error) {
-        btn.disabled = false;
-        btn.textContent = '🔓 Perpanjang Lisensi';
-        alert('❌ Terjadi kesalahan: ' + error.message);
-    }
-});
+        
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            hideModal();
+            alert('✅ Login berhasil!');
+        } catch (error) {
+            alert('❌ ' + error.message);
+        }
+    });
 
-// === NAVIGASI MODAL ===
-document.getElementById('goToRegister').addEventListener('click', function(e) {
-    e.preventDefault();
-    showModal('register');
-});
+    // === REGISTER ===
+    document.getElementById('registerBtnAction').addEventListener('click', async function() {
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const name = document.getElementById('regName').value.trim();
+        const phone = document.getElementById('regPhone').value.trim();
+        
+        if (!email || !password || !name || !phone) {
+            alert('Isi semua data.');
+            return;
+        }
+        if (password.length < 6) {
+            alert('Password minimal 6 karakter.');
+            return;
+        }
+        
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await createUser(email, name, phone);
+            await createLicense(email, CONFIG.DEFAULT_QUOTA, CONFIG.DEFAULT_DAYS);
+            hideModal();
+            alert('✅ Registrasi berhasil! Anda mendapat ' + CONFIG.DEFAULT_QUOTA + ' kuota.');
+        } catch (error) {
+            alert('❌ ' + error.message);
+        }
+    });
 
-document.getElementById('goToLogin').addEventListener('click', function(e) {
-    e.preventDefault();
-    showModal('login');
-});
+    // === REDEEM TOKEN ===
+    document.getElementById('redeemTokenBtn').addEventListener('click', async function() {
+        const user = auth.currentUser;
+        if (!user) {
+            alert('Silakan login terlebih dahulu.');
+            return;
+        }
+        
+        const token = document.getElementById('tokenInput').value.trim();
+        if (!token) {
+            alert('Masukkan token.');
+            return;
+        }
+        
+        const btn = this;
+        btn.disabled = true;
+        btn.textContent = '⏳ Memproses...';
+        
+        try {
+            const result = await redeemToken(user.email, token);
+            btn.disabled = false;
+            btn.textContent = '🔓 Perpanjang Lisensi';
+            
+            if (result.success) {
+                hideModal();
+                await updateStatusBar(user);
+                alert('✅ ' + result.message);
+            } else {
+                alert('❌ ' + result.message);
+            }
+        } catch (error) {
+            btn.disabled = false;
+            btn.textContent = '🔓 Perpanjang Lisensi';
+            alert('❌ Terjadi kesalahan: ' + error.message);
+        }
+    });
 
-document.getElementById('closeModalBtn').addEventListener('click', function(e) {
-    e.preventDefault();
-    hideModal();
-});
+    // === NAVIGASI MODAL ===
+    document.getElementById('goToRegister').addEventListener('click', function(e) {
+        e.preventDefault();
+        showModal('register');
+    });
 
-document.getElementById('loginBtn').addEventListener('click', function() {
-    showModal('login');
-});
+    document.getElementById('goToLogin').addEventListener('click', function(e) {
+        e.preventDefault();
+        showModal('login');
+    });
 
-document.getElementById('tokenBtn').addEventListener('click', function() {
-    if (!auth.currentUser) {
-        alert('Silakan login terlebih dahulu.');
-        return;
-    }
-    showModal('token');
-});
+    document.getElementById('closeModalBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        hideModal();
+    });
 
-document.getElementById('logoutBtn').addEventListener('click', function() {
-    if (confirm('Yakin ingin logout?')) {
-        signOut(auth);
-        document.getElementById('results').style.display = 'none';
-    }
-});
+    document.getElementById('loginBtn').addEventListener('click', function() {
+        showModal('login');
+    });
 
-// === HISTORY ===
-document.getElementById('historyBtn').addEventListener('click', async function() {
-    const user = auth.currentUser;
-    if (!user) {
-        alert('Silakan login terlebih dahulu.');
-        return;
-    }
-    await loadHistory(user.email);
-    document.getElementById('historyModal').classList.add('show');
-});
+    document.getElementById('tokenBtn').addEventListener('click', function() {
+        if (!auth.currentUser) {
+            alert('Silakan login terlebih dahulu.');
+            return;
+        }
+        showModal('token');
+    });
 
-document.getElementById('closeHistoryBtn').addEventListener('click', function() {
-    document.getElementById('historyModal').classList.remove('show');
-});
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        if (confirm('Yakin ingin logout?')) {
+            signOut(auth);
+            document.getElementById('results').style.display = 'none';
+        }
+    });
 
-document.getElementById('deleteAllHistoryBtn').addEventListener('click', async function() {
-    const user = auth.currentUser;
-    if (!user) return;
-    if (confirm('Yakin ingin menghapus semua riwayat perhitungan?')) {
-        await deleteAllUserHistory(user.email);
+    // === HISTORY ===
+    document.getElementById('historyBtn').addEventListener('click', async function() {
+        const user = auth.currentUser;
+        if (!user) {
+            alert('Silakan login terlebih dahulu.');
+            return;
+        }
         await loadHistory(user.email);
-        alert('✅ Semua riwayat telah dihapus.');
-    }
+        document.getElementById('historyModal').classList.add('show');
+    });
+
+    document.getElementById('closeHistoryBtn').addEventListener('click', function() {
+        document.getElementById('historyModal').classList.remove('show');
+    });
+
+    document.getElementById('deleteAllHistoryBtn').addEventListener('click', async function() {
+        const user = auth.currentUser;
+        if (!user) return;
+        if (confirm('Yakin ingin menghapus semua riwayat perhitungan?')) {
+            await deleteAllUserHistory(user.email);
+            await loadHistory(user.email);
+            alert('✅ Semua riwayat telah dihapus.');
+        }
+    });
+
+    // === QUOTA MODAL CLOSE ===
+    document.getElementById('closeQuotaModalBtn').addEventListener('click', function() {
+        document.getElementById('quotaModal').classList.remove('show');
+    });
+
+    // === PRINT ===
+    document.getElementById('printBtn').addEventListener('click', function() {
+        window.print();
+    });
+
+    // === AUTO-TAB INPUT ===
+    document.getElementById('dobDay').addEventListener('input', function() {
+        if (this.value.length === 2) document.getElementById('dobMonth').focus();
+    });
+    document.getElementById('dobMonth').addEventListener('input', function() {
+        if (this.value.length === 2) document.getElementById('dobYear').focus();
+    });
+
+    // === MAIN CALCULATE ===
+    document.getElementById('calcBtn').addEventListener('click', async function() {
+        var name = document.getElementById('fname').value.trim();
+        var day = document.getElementById('dobDay').value.trim();
+        var month = document.getElementById('dobMonth').value.trim();
+        var year = document.getElementById('dobYear').value.trim();
+        var errBox = document.getElementById('errBox');
+        errBox.style.display = 'none';
+        errBox.textContent = '';
+        
+        if (!name || !day || !month || !year) {
+            errBox.textContent = 'Isi nama dan tanggal lahir lengkap.';
+            errBox.style.display = 'block';
+            return;
+        }
+        
+        var d = parseInt(day), m = parseInt(month), y = parseInt(year);
+        if (isNaN(d) || isNaN(m) || isNaN(y) || y < 1900 || y > 2050 || m < 1 || m > 12 || d < 1 || d > 31) {
+            errBox.textContent = 'Tanggal lahir tidak valid.';
+            errBox.style.display = 'block';
+            return;
+        }
+        
+        var user = auth.currentUser;
+        if (!user) {
+            showModal('login');
+            return;
+        }
+        
+        var status = await getLicenseStatus(user.email);
+        if (!status.active) {
+            showQuotaModal(user);
+            return;
+        }
+        
+        var updated = await updateLicenseUsage(user.email);
+        if (!updated) {
+            alert('Gagal mengurangi kuota.');
+            return;
+        }
+        
+        var dateStr = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+        var todayStr = new Date().toISOString().slice(0,10);
+        var profile = computeProfile(dateStr, todayStr);
+        
+        await saveUserHistory(user.email, name, day + '/' + month + '/' + year);
+        displayResult(name, day + '/' + month + '/' + year, profile);
+        await updateStatusBar(user);
+    });
 });
 
+// ============================================================
+// LOAD HISTORY (global function untuk view-btn)
+// ============================================================
 async function loadHistory(email) {
     const container = document.getElementById('historyContent');
     const history = await getUserHistory(email);
@@ -2161,7 +2212,9 @@ async function loadHistory(email) {
     });
 }
 
-// === CALCULATE WITHOUT QUOTA ===
+// ============================================================
+// CALCULATE WITHOUT QUOTA (global function)
+// ============================================================
 async function calculateWithoutQuota() {
     var name = document.getElementById('fname').value.trim();
     var day = document.getElementById('dobDay').value.trim();
@@ -2189,74 +2242,6 @@ async function calculateWithoutQuota() {
     var profile = computeProfile(dateStr, todayStr);
     displayResult(name, day + '/' + month + '/' + year, profile);
 }
-
-// === MAIN CALCULATE ===
-document.getElementById('calcBtn').addEventListener('click', async function() {
-    var name = document.getElementById('fname').value.trim();
-    var day = document.getElementById('dobDay').value.trim();
-    var month = document.getElementById('dobMonth').value.trim();
-    var year = document.getElementById('dobYear').value.trim();
-    var errBox = document.getElementById('errBox');
-    errBox.style.display = 'none';
-    errBox.textContent = '';
-    
-    if (!name || !day || !month || !year) {
-        errBox.textContent = 'Isi nama dan tanggal lahir lengkap.';
-        errBox.style.display = 'block';
-        return;
-    }
-    
-    var d = parseInt(day), m = parseInt(month), y = parseInt(year);
-    if (isNaN(d) || isNaN(m) || isNaN(y) || y < 1900 || y > 2050 || m < 1 || m > 12 || d < 1 || d > 31) {
-        errBox.textContent = 'Tanggal lahir tidak valid.';
-        errBox.style.display = 'block';
-        return;
-    }
-    
-    var user = auth.currentUser;
-    if (!user) {
-        showModal('login');
-        return;
-    }
-    
-    var status = await getLicenseStatus(user.email);
-    if (!status.active) {
-        showQuotaModal(user);
-        return;
-    }
-    
-    var updated = await updateLicenseUsage(user.email);
-    if (!updated) {
-        alert('Gagal mengurangi kuota.');
-        return;
-    }
-    
-    var dateStr = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-    var todayStr = new Date().toISOString().slice(0,10);
-    var profile = computeProfile(dateStr, todayStr);
-    
-    await saveUserHistory(user.email, name, day + '/' + month + '/' + year);
-    displayResult(name, day + '/' + month + '/' + year, profile);
-    await updateStatusBar(user);
-});
-
-// === PRINT ===
-document.getElementById('printBtn').addEventListener('click', function() {
-    window.print();
-});
-
-// === AUTO-TAB INPUT ===
-document.getElementById('dobDay').addEventListener('input', function() {
-    if (this.value.length === 2) document.getElementById('dobMonth').focus();
-});
-document.getElementById('dobMonth').addEventListener('input', function() {
-    if (this.value.length === 2) document.getElementById('dobYear').focus();
-});
-
-// === QUOTA MODAL CLOSE ===
-document.getElementById('closeQuotaModalBtn').addEventListener('click', function() {
-    document.getElementById('quotaModal').classList.remove('show');
-});
 
 // ============================================================
 // AUTH STATE OBSERVER
