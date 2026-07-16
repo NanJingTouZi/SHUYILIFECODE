@@ -807,6 +807,7 @@ ul.trait-list li:last-child{border-bottom:none;}
     <span class="status-item" id="masaItem">⏰ Masa Aktif: <span class="val" id="displayMasaAktif">0</span> hari</span>
     <span class="status-item" id="expiredItem">📅 Expired: <span class="val" id="displayExpired">—</span></span>
     <div style="flex:1;"></div>
+    <button class="token-btn" id="changePasswordBtn" style="display:none;">🔑 Ganti Password</button>
     <button class="token-btn" id="historyBtn">📊 Riwayat</button>
     <button class="token-btn" id="tokenBtn">🔑 Token</button>
     <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
@@ -895,7 +896,10 @@ ul.trait-list li:last-child{border-bottom:none;}
       <div class="modal-btns">
         <button class="btn btn-block" id="loginBtnAction">Login</button>
       </div>
-      <p style="text-align:center;font-size:13px;margin-top:12px;color:var(--paper-dim);">
+      <p style="text-align:center;font-size:13px;margin-top:8px;color:var(--paper-dim);">
+        <a href="#" id="forgotPasswordBtn" style="color:var(--gold-soft);text-decoration:none;">Lupa password?</a>
+      </p>
+      <p style="text-align:center;font-size:13px;margin-top:4px;color:var(--paper-dim);">
         Belum punya akun? <a href="#" id="goToRegister" style="color:var(--gold-soft);text-decoration:none;">Daftar di sini</a>
       </p>
     </div>
@@ -1028,6 +1032,59 @@ ul.trait-list li:last-child{border-bottom:none;}
   </div>
 </div>
 
+<!-- Modal Forgot Password -->
+<div class="modal-overlay" id="forgotPasswordModal">
+  <div class="modal-box">
+    <div class="modal-icon">🔑</div>
+    <h2>Reset Password</h2>
+    <p style="color:var(--paper-dim);font-size:13px;">
+      Masukkan email Anda. Kami akan kirim link untuk membuat password baru.
+    </p>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="resetEmail" placeholder="email@domain.com">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-block" id="resetPasswordBtn">Kirim Link Reset</button>
+    </div>
+    <p style="text-align:center;font-size:13px;margin-top:12px;color:var(--paper-dim);">
+      <a href="#" id="backToLoginFromReset" style="color:var(--gold-soft);text-decoration:none;">Kembali ke Login</a>
+    </p>
+    <div style="text-align:center;margin-top:12px;">
+      <a href="#" id="closeForgotModalBtn" style="color:var(--paper-dim);opacity:0.5;text-decoration:none;font-size:13px;">Tutup</a>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Change Password -->
+<div class="modal-overlay" id="changePasswordModal">
+  <div class="modal-box">
+    <div class="modal-icon">🔐</div>
+    <h2>Ganti Password</h2>
+    <p style="color:var(--paper-dim);font-size:13px;">
+      Masukkan password lama dan password baru Anda.
+    </p>
+    <div class="form-group">
+      <label>Password Lama</label>
+      <input type="password" id="oldPassword" placeholder="Password lama">
+    </div>
+    <div class="form-group" style="margin-top:12px;">
+      <label>Password Baru</label>
+      <input type="password" id="newPassword" placeholder="Minimal 6 karakter">
+    </div>
+    <div class="form-group" style="margin-top:12px;">
+      <label>Konfirmasi Password Baru</label>
+      <input type="password" id="confirmNewPassword" placeholder="Konfirmasi password baru">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-block btn-primary" id="changePasswordSubmitBtn">Ganti Password</button>
+    </div>
+    <div style="text-align:center;margin-top:12px;">
+      <a href="#" id="closeChangePasswordBtn" style="color:var(--paper-dim);opacity:0.5;text-decoration:none;font-size:13px;">Tutup</a>
+    </div>
+  </div>
+</div>
+
 <!-- ============================================================
    CUSTOM ALERT MODAL
    ============================================================ -->
@@ -1115,7 +1172,6 @@ function showCustomAlert(type, title, message) {
     else if (type === 'error') btn.classList.add('alert-btn-danger');
     btn.textContent = 'OK';
     
-    // Hapus tombol batal jika ada
     var cancelBtn = document.querySelector('.alert-btn-cancel');
     if (cancelBtn) cancelBtn.remove();
     
@@ -1143,7 +1199,6 @@ function showCustomAlertConfirm(title, message, confirmText, cancelText, callbac
     btn.textContent = confirmText || 'Ya';
     btn.className = 'alert-btn alert-btn-danger';
     
-    // Hapus tombol batal lama jika ada
     var oldCancel = document.querySelector('.alert-btn-cancel');
     if (oldCancel) oldCancel.remove();
     
@@ -2155,6 +2210,7 @@ async function updateStatusBar() {
     var tokenBtn = document.getElementById('tokenBtn');
     var logoutBtn = document.getElementById('logoutBtn');
     var loginBtn = document.getElementById('loginBtn');
+    var changePasswordBtn = document.getElementById('changePasswordBtn');
     
     if (!bar) return;
     
@@ -2170,6 +2226,7 @@ async function updateStatusBar() {
         if (tokenBtn) tokenBtn.style.display = 'none';
         if (logoutBtn) logoutBtn.style.display = 'none';
         if (loginBtn) loginBtn.style.display = 'inline-block';
+        if (changePasswordBtn) changePasswordBtn.style.display = 'none';
         return;
     }
     
@@ -2189,6 +2246,7 @@ async function updateStatusBar() {
     if (tokenBtn) tokenBtn.style.display = 'inline-block';
     if (logoutBtn) logoutBtn.style.display = 'inline-block';
     if (loginBtn) loginBtn.style.display = 'none';
+    if (changePasswordBtn) changePasswordBtn.style.display = 'inline-block';
     
     var status = await getLicenseStatus(session.email);
     
@@ -2488,6 +2546,162 @@ document.getElementById('loginBtnAction').addEventListener('click', async functi
             showCustomAlert('error', 'Error', error.message);
         }
     }
+});
+
+// --- FORGOT PASSWORD ---
+document.getElementById('forgotPasswordBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    if (!email) {
+        showCustomAlert('warning', 'Peringatan', 'Masukkan email Anda terlebih dahulu.');
+        return;
+    }
+    document.getElementById('resetEmail').value = email;
+    document.getElementById('loginModal').classList.remove('show');
+    document.getElementById('forgotPasswordModal').classList.add('show');
+    document.getElementById('resetEmail').focus();
+});
+
+document.getElementById('resetPasswordBtn').addEventListener('click', function() {
+    const email = document.getElementById('resetEmail').value.trim();
+    if (!email || !email.includes('@') || !email.includes('.')) {
+        showCustomAlert('warning', 'Peringatan', 'Masukkan email yang valid.');
+        return;
+    }
+    
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = '⏳ Mengirim...';
+    
+    auth.sendPasswordResetEmail(email)
+        .then(function() {
+            btn.disabled = false;
+            btn.textContent = 'Kirim Link Reset';
+            document.getElementById('forgotPasswordModal').classList.remove('show');
+            showCustomAlert('success', 'Email Terkirim', 'Link reset password telah dikirim ke ' + email + '. Cek inbox Anda.');
+        })
+        .catch(function(error) {
+            btn.disabled = false;
+            btn.textContent = 'Kirim Link Reset';
+            if (error.code === 'auth/user-not-found') {
+                showCustomAlert('warning', 'Email Tidak Ditemukan', 'Email ini belum terdaftar. Silakan registrasi.');
+            } else {
+                showCustomAlert('error', 'Gagal', error.message);
+            }
+        });
+});
+
+document.getElementById('backToLoginFromReset').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('forgotPasswordModal').classList.remove('show');
+    document.getElementById('loginModal').classList.add('show');
+});
+
+document.getElementById('closeForgotModalBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('forgotPasswordModal').classList.remove('show');
+    document.getElementById('loginModal').classList.add('show');
+});
+
+document.getElementById('forgotPasswordModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.remove('show');
+        document.getElementById('loginModal').classList.add('show');
+    }
+});
+
+document.getElementById('resetEmail').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('resetPasswordBtn').click();
+    }
+});
+
+// --- CHANGE PASSWORD ---
+document.getElementById('changePasswordBtn').addEventListener('click', function() {
+    const session = getSession();
+    if (!session) {
+        showCustomAlert('warning', 'Perlu Login', 'Silakan login terlebih dahulu.');
+        return;
+    }
+    document.getElementById('oldPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmNewPassword').value = '';
+    document.getElementById('changePasswordModal').classList.add('show');
+    document.getElementById('oldPassword').focus();
+});
+
+document.getElementById('changePasswordSubmitBtn').addEventListener('click', function() {
+    const oldPassword = document.getElementById('oldPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmNewPassword').value;
+    
+    if (!oldPassword) {
+        showCustomAlert('warning', 'Peringatan', 'Masukkan password lama.');
+        return;
+    }
+    if (!newPassword || newPassword.length < 6) {
+        showCustomAlert('warning', 'Peringatan', 'Password baru minimal 6 karakter.');
+        return;
+    }
+    if (newPassword !== confirmPassword) {
+        showCustomAlert('warning', 'Peringatan', 'Password baru dan konfirmasi tidak sama.');
+        return;
+    }
+    
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = '⏳ Memproses...';
+    
+    const user = auth.currentUser;
+    if (!user) {
+        showCustomAlert('error', 'Gagal', 'Anda belum login.');
+        btn.disabled = false;
+        btn.textContent = 'Ganti Password';
+        return;
+    }
+    
+    const credential = firebase.auth.EmailAuthProvider.credential(user.email, oldPassword);
+    
+    user.reauthenticateWithCredential(credential)
+        .then(function() {
+            return user.updatePassword(newPassword);
+        })
+        .then(function() {
+            btn.disabled = false;
+            btn.textContent = 'Ganti Password';
+            document.getElementById('changePasswordModal').classList.remove('show');
+            showCustomAlert('success', 'Berhasil', 'Password Anda berhasil diubah!');
+        })
+        .catch(function(error) {
+            btn.disabled = false;
+            btn.textContent = 'Ganti Password';
+            if (error.code === 'auth/wrong-password') {
+                showCustomAlert('error', 'Gagal', 'Password lama salah.');
+            } else {
+                showCustomAlert('error', 'Gagal', error.message);
+            }
+        });
+});
+
+document.getElementById('closeChangePasswordBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('changePasswordModal').classList.remove('show');
+});
+
+document.getElementById('changePasswordModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.remove('show');
+    }
+});
+
+document.getElementById('oldPassword').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('newPassword').focus();
+});
+document.getElementById('newPassword').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('confirmNewPassword').focus();
+});
+document.getElementById('confirmNewPassword').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('changePasswordSubmitBtn').click();
 });
 
 // --- REGISTER ---
