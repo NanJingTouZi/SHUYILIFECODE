@@ -753,18 +753,17 @@ ul.trait-list li:last-child{border-bottom:none;}
   <!-- ============================================================
        USER STATUS BAR
        ============================================================ -->
-  <<div id="userStatusBar" style="display:none;" class="user-status-bar">
+  <div id="userStatusBar" style="display:none;" class="user-status-bar">
     <span class="user-name" id="displayName">—</span>
-    <span class="status-item" id="kuotaItem">📊 Kuota: <span class="val success" id="displayKuota">5/5</span></span>
-    <span class="status-item" id="masaItem">⏰ Masa Aktif: <span class="val" id="displayMasaAktif">30</span> hari</span>
-    <span class="status-item" id="expiredItem">📅 Expired: <span class="val" id="displayExpired">2026-08-16</span></span>
+    <span class="status-item" id="kuotaItem">📊 Kuota: <span class="val success" id="displayKuota">0</span></span>
+    <span class="status-item" id="masaItem">⏰ Masa Aktif: <span class="val" id="displayMasaAktif">0</span> hari</span>
+    <span class="status-item" id="expiredItem">📅 Expired: <span class="val" id="displayExpired">—</span></span>
     <div style="flex:1;"></div>
     <button class="token-btn" id="historyBtn">📊 Riwayat</button>
     <button class="token-btn" id="tokenBtn">🔑 Token</button>
     <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
     <button class="login-btn" id="loginBtn" style="display:none;">🔐 Login</button>
 </div>
-
   <!-- ============================================================
        LICENSE WARNING
        ============================================================ -->
@@ -1568,40 +1567,33 @@ function getWALink(email) {
 // UI FUNCTIONS
 // ============================================================
 function updateStatusBar() {
+    console.log('🔄 updateStatusBar() dipanggil');
+    
     var session = getSession();
+    console.log('📧 Session:', session);
+    
     var bar = document.getElementById('userStatusBar');
     var warning = document.getElementById('licenseWarning');
     
-    // Ambil semua elemen
-    var nameEl = document.getElementById('displayName');
-    var kuotaEl = document.getElementById('displayKuota');
-    var masaEl = document.getElementById('displayMasaAktif');
-    var expiredEl = document.getElementById('displayExpired');
-    var kuotaItem = document.getElementById('kuotaItem');
-    var masaItem = document.getElementById('masaItem');
-    var expiredItem = document.getElementById('expiredItem');
-    var historyBtn = document.getElementById('historyBtn');
-    var tokenBtn = document.getElementById('tokenBtn');
-    var logoutBtn = document.getElementById('logoutBtn');
-    var loginBtn = document.getElementById('loginBtn');
-    
-    // Jika elemen tidak ada, berhenti
-    if (!bar) return;
+    if (!bar) {
+        console.log('❌ Elemen userStatusBar tidak ditemukan!');
+        return;
+    }
     
     if (!session) {
-        // BELUM LOGIN
+        console.log('🔴 BELUM LOGIN');
         bar.style.display = 'flex';
         if (warning) warning.style.display = 'none';
         document.getElementById('formCard').style.display = 'block';
         
-        if (nameEl) nameEl.textContent = '👤 Belum Login';
-        if (kuotaItem) kuotaItem.style.display = 'none';
-        if (masaItem) masaItem.style.display = 'none';
-        if (expiredItem) expiredItem.style.display = 'none';
-        if (historyBtn) historyBtn.style.display = 'none';
-        if (tokenBtn) tokenBtn.style.display = 'none';
-        if (logoutBtn) logoutBtn.style.display = 'none';
-        if (loginBtn) loginBtn.style.display = 'inline-block';
+        document.getElementById('displayName').textContent = '👤 Belum Login';
+        document.getElementById('kuotaItem').style.display = 'none';
+        document.getElementById('masaItem').style.display = 'none';
+        document.getElementById('expiredItem').style.display = 'none';
+        document.getElementById('historyBtn').style.display = 'none';
+        document.getElementById('tokenBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'none';
+        document.getElementById('loginBtn').style.display = 'inline-block';
         return;
     }
     
@@ -1612,18 +1604,22 @@ function updateStatusBar() {
         return;
     }
     
-    // SUDAH LOGIN - TAMPILKAN SEMUA
-    bar.style.display = 'flex';
-    if (nameEl) nameEl.textContent = '👤 ' + user.name;
-    if (kuotaItem) kuotaItem.style.display = 'flex';
-    if (masaItem) masaItem.style.display = 'flex';
-    if (expiredItem) expiredItem.style.display = 'flex';
-    if (historyBtn) historyBtn.style.display = 'inline-block';
-    if (tokenBtn) tokenBtn.style.display = 'inline-block';
-    if (logoutBtn) logoutBtn.style.display = 'inline-block';
-    if (loginBtn) loginBtn.style.display = 'none';
+    console.log('🟢 SUDAH LOGIN: ' + user.name);
     
+    // Tampilkan semua elemen
+    bar.style.display = 'flex';
+    document.getElementById('displayName').textContent = '👤 ' + user.name;
+    document.getElementById('kuotaItem').style.display = 'flex';
+    document.getElementById('masaItem').style.display = 'flex';
+    document.getElementById('expiredItem').style.display = 'flex';
+    document.getElementById('historyBtn').style.display = 'inline-block';
+    document.getElementById('tokenBtn').style.display = 'inline-block';
+    document.getElementById('logoutBtn').style.display = 'inline-block';
+    document.getElementById('loginBtn').style.display = 'none';
+    
+    // Ambil lisensi
     var license = getLicense(session.email);
+    console.log('📋 License:', license);
     
     if (license && license.is_active) {
         var remaining = license.quota - (license.used_count || 0);
@@ -1631,34 +1627,26 @@ function updateStatusBar() {
         var now = new Date();
         var daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
         
-        if (kuotaEl) {
-            kuotaEl.textContent = remaining + '/' + license.quota;
-            kuotaEl.className = 'val success';
-        }
-        if (masaEl) {
-            masaEl.textContent = daysLeft > 0 ? daysLeft : 0;
-            masaEl.className = 'val';
-        }
-        if (expiredEl) {
-            expiredEl.textContent = license.expiry_date || '—';
-            expiredEl.className = 'val';
-        }
+        console.log('📊 Kuota: ' + remaining + '/' + license.quota);
+        console.log('📅 Expired: ' + license.expiry_date);
+        
+        document.getElementById('displayKuota').textContent = remaining + '/' + license.quota;
+        document.getElementById('displayKuota').className = 'val success';
+        document.getElementById('displayMasaAktif').textContent = daysLeft > 0 ? daysLeft : 0;
+        document.getElementById('displayMasaAktif').className = 'val';
+        document.getElementById('displayExpired').textContent = license.expiry_date || '—';
+        document.getElementById('displayExpired').className = 'val';
         
         if (warning) warning.style.display = 'none';
         document.getElementById('formCard').style.display = 'block';
     } else {
-        if (kuotaEl) {
-            kuotaEl.textContent = '0/0';
-            kuotaEl.className = 'val danger';
-        }
-        if (masaEl) {
-            masaEl.textContent = '0';
-            masaEl.className = 'val danger';
-        }
-        if (expiredEl) {
-            expiredEl.textContent = '—';
-            expiredEl.className = 'val danger';
-        }
+        console.log('⚠️ Lisensi tidak aktif atau tidak ditemukan');
+        document.getElementById('displayKuota').textContent = '0/0';
+        document.getElementById('displayKuota').className = 'val danger';
+        document.getElementById('displayMasaAktif').textContent = '0';
+        document.getElementById('displayMasaAktif').className = 'val danger';
+        document.getElementById('displayExpired').textContent = '—';
+        document.getElementById('displayExpired').className = 'val danger';
         
         if (license && !license.is_active) {
             if (warning) {
@@ -1673,7 +1661,6 @@ function updateStatusBar() {
         }
     }
 }
-
 // ============================================================
 // MODAL FUNCTIONS
 // ============================================================
