@@ -59,6 +59,18 @@
             box-shadow: 0 2px 0 #a07a1e;
         }
 
+        .timer-info {
+            color: #7e9bb5;
+            font-size: 13px;
+            margin-top: 16px;
+            opacity: 0.7;
+        }
+
+        .timer-info span {
+            color: #f5c842;
+            font-weight: 600;
+        }
+
         @media (max-width: 600px) {
             .btn-lanjut {
                 padding: 14px 40px;
@@ -76,39 +88,55 @@
             src="nanjing1.jpeg" 
             alt="Nanjing Investment" 
             class="splash-image"
+            id="splashImage"
         />
 
         <!-- Tombol Lanjutkan -->
         <button class="btn-lanjut" id="btnLanjut">
             Lanjutkan →
         </button>
+
+        <div class="timer-info">
+            ⏱️ Akan muncul kembali jika <span>1 jam</span> tidak mengunjungi aplikasi
+        </div>
     </div>
 
     <script>
         // ===== KONFIGURASI =====
         const ONE_HOUR = 60 * 60 * 1000; // 1 jam
-        const STORAGE_KEY = 'nanjing_last_visit';
+        const STORAGE_KEY = 'nanjing_last_visit_lifecode';
 
-        // ===== CEK WAKTU KUNJUNGAN =====
+        // ===== CEK WAKTU TERAKHIR AKSES LIFECODE =====
         function checkLastVisit() {
             const lastVisit = localStorage.getItem(STORAGE_KEY);
             const currentTime = Date.now();
 
             if (lastVisit) {
                 const timeDiff = currentTime - parseInt(lastVisit, 10);
+                
+                // Jika kurang dari 1 jam → langsung ke lifecode.html
                 if (timeDiff < ONE_HOUR) {
-                    // Jika kurang dari 1 jam → langsung ke lifecode.html
+                    console.log('⏳ Masih dalam 1 jam, langsung ke lifecode...');
                     window.location.href = 'lifecode.html';
                     return true;
+                } else {
+                    console.log('⏰ Sudah lebih dari 1 jam, tampilkan splash...');
+                    return false;
                 }
+            } else {
+                // Pertama kali buka → tampilkan splash
+                console.log('🆕 Pertama kali buka, tampilkan splash...');
+                return false;
             }
-            return false;
         }
 
         // ===== FUNGSI MASUK KE LIFECODE =====
         function goToLifecode() {
-            // Simpan waktu kunjungan
-            localStorage.setItem(STORAGE_KEY, Date.now().toString());
+            // Simpan waktu sekarang sebagai waktu terakhir akses lifecode
+            const currentTime = Date.now();
+            localStorage.setItem(STORAGE_KEY, currentTime.toString());
+            console.log('💾 Waktu kunjungan lifecode disimpan:', new Date(currentTime).toLocaleString());
+            
             // Redirect ke lifecode.html
             window.location.href = 'lifecode.html';
         }
@@ -120,12 +148,26 @@
         if (!isRedirected) {
             // Tombol Lanjutkan
             const btnLanjut = document.getElementById('btnLanjut');
-            btnLanjut.addEventListener('click', goToLifecode);
+            btnLanjut.addEventListener('click', function(e) {
+                e.preventDefault();
+                goToLifecode();
+            });
 
             // Klik pada gambar juga bisa lanjut
-            const splashImage = document.querySelector('.splash-image');
-            splashImage.addEventListener('click', goToLifecode);
+            const splashImage = document.getElementById('splashImage');
+            splashImage.addEventListener('click', function() {
+                goToLifecode();
+            });
             splashImage.style.cursor = 'pointer';
+
+            // Klik pada container juga bisa lanjut
+            document.querySelector('.splash-container').addEventListener('click', function(e) {
+                // Jangan trigger jika yang diklik adalah tombol (sudah terhandle)
+                if (e.target === btnLanjut || e.target.closest('.btn-lanjut')) {
+                    return;
+                }
+                goToLifecode();
+            });
 
             // Keyboard: Enter atau Space
             document.addEventListener('keydown', function(e) {
@@ -135,7 +177,20 @@
                 }
             });
 
-            console.log('✅ Klik tombol atau gambar untuk masuk ke lifecode.html');
+            console.log('✅ Splash siap. Klik tombol, gambar, atau area untuk masuk ke lifecode.html');
+        }
+
+        // ===== TAMPILKAN INFO DI CONSOLE =====
+        const lastVisit = localStorage.getItem(STORAGE_KEY);
+        if (lastVisit) {
+            const date = new Date(parseInt(lastVisit, 10));
+            console.log('📅 Terakhir akses lifecode:', date.toLocaleString());
+            const diff = Date.now() - parseInt(lastVisit, 10);
+            const hours = Math.floor(diff / (60 * 60 * 1000));
+            const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+            console.log(`⏱️ Selisih: ${hours} jam ${minutes} menit`);
+        } else {
+            console.log('📅 Belum pernah akses lifecode sebelumnya');
         }
     </script>
 
