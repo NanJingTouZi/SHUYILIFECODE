@@ -17,13 +17,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
+            padding: 20px;
         }
 
         .splash-container {
             max-width: 800px;
-            width: 90%;
-            padding: 10px;
+            width: 100%;
+            text-align: center;
         }
 
         .splash-image {
@@ -32,26 +32,64 @@
             display: block;
             border-radius: 12px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            margin-bottom: 30px;
+        }
+
+        .btn-lanjut {
+            background: linear-gradient(135deg, #f5c842, #dba62b);
+            border: none;
+            border-radius: 50px;
+            padding: 16px 60px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #0a1a2b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 0 #a07a1e, 0 10px 30px rgba(245, 200, 66, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .btn-lanjut:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #a07a1e, 0 15px 40px rgba(245, 200, 66, 0.4);
+        }
+
+        .btn-lanjut:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #a07a1e;
+        }
+
+        @media (max-width: 600px) {
+            .btn-lanjut {
+                padding: 14px 40px;
+                font-size: 17px;
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="splash-container" id="splashContainer">
+    <div class="splash-container">
+        <!-- Gambar Iklan -->
         <img 
             src="nanjing1.jpeg" 
             alt="Nanjing Investment" 
             class="splash-image"
-            id="splashImage"
         />
+
+        <!-- Tombol Lanjutkan -->
+        <button class="btn-lanjut" id="btnLanjut">
+            Lanjutkan →
+        </button>
     </div>
 
     <script>
         // ===== KONFIGURASI =====
-        const ONE_HOUR = 60 * 60 * 1000;
+        const ONE_HOUR = 60 * 60 * 1000; // 1 jam
         const STORAGE_KEY = 'nanjing_last_visit';
 
-        // ===== CEK WAKTU =====
+        // ===== CEK WAKTU KUNJUNGAN =====
         function checkLastVisit() {
             const lastVisit = localStorage.getItem(STORAGE_KEY);
             const currentTime = Date.now();
@@ -59,6 +97,7 @@
             if (lastVisit) {
                 const timeDiff = currentTime - parseInt(lastVisit, 10);
                 if (timeDiff < ONE_HOUR) {
+                    // Jika kurang dari 1 jam → langsung ke lifecode.html
                     window.location.href = 'lifecode.html';
                     return true;
                 }
@@ -66,19 +105,28 @@
             return false;
         }
 
-        // ===== FUNGSI MASUK =====
+        // ===== FUNGSI MASUK KE LIFECODE =====
         function goToLifecode() {
+            // Simpan waktu kunjungan
             localStorage.setItem(STORAGE_KEY, Date.now().toString());
+            // Redirect ke lifecode.html
             window.location.href = 'lifecode.html';
         }
 
         // ===== EKSEKUSI =====
         const isRedirected = checkLastVisit();
 
+        // Jika tidak redirect (artinya tampilkan splash)
         if (!isRedirected) {
-            // Klik di mana saja akan masuk
-            document.body.addEventListener('click', goToLifecode);
-            
+            // Tombol Lanjutkan
+            const btnLanjut = document.getElementById('btnLanjut');
+            btnLanjut.addEventListener('click', goToLifecode);
+
+            // Klik pada gambar juga bisa lanjut
+            const splashImage = document.querySelector('.splash-image');
+            splashImage.addEventListener('click', goToLifecode);
+            splashImage.style.cursor = 'pointer';
+
             // Keyboard: Enter atau Space
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -87,7 +135,7 @@
                 }
             });
 
-            console.log('✅ Klik gambar atau di mana saja untuk masuk ke lifecode.html');
+            console.log('✅ Klik tombol atau gambar untuk masuk ke lifecode.html');
         }
     </script>
 
