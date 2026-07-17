@@ -3003,5 +3003,15 @@ console.log('📌 Data di Firestore: users, licenses, codes, history');
 console.log('🔐 Firebase Auth untuk login (Email + Password)');
 console.log('📧 OTP via EmailJS untuk verifikasi register');
 </script>
+   <script>
+    // ===== SIMPAN WAKTU AKSES LIFECODE =====
+    // Ini akan update waktu setiap kali user buka lifecode.html
+    (function() {
+        const STORAGE_KEY = 'nanjing_last_visit_lifecode';
+        const currentTime = Date.now();
+        localStorage.setItem(STORAGE_KEY, currentTime.toString());
+        console.log('💾 Waktu akses lifecode diupdate:', new Date(currentTime).toLocaleString());
+    })();
+</script>
 </body>
 </html>
