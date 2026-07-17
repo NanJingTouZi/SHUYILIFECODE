@@ -202,9 +202,9 @@
     <!-- ============================================= -->
     <div class="splash-container" id="splashContainer">
 
-        <!-- Gambar Iklan -->
+        <!-- Gambar Iklan (menggunakan .jpeg) -->
         <img 
-            src="nanjing1.jpg" 
+            src="nanjing1.jpeg" 
             alt="Nanjing Investment - Promo" 
             class="splash-image"
             id="splashImage"
@@ -260,7 +260,6 @@
                         return true; // redirect terjadi
                     } else {
                         console.log('⏰ Sudah lebih dari 1 jam, tampilkan splash...');
-                        // Update waktu kunjungan (akan di-update lagi saat klik tombol)
                         return false;
                     }
                 } else {
@@ -271,22 +270,16 @@
 
             // ===== FUNGSI MASUK KE INDEX =====
             function goToIndex() {
-                // Simpan waktu kunjungan sekarang
                 const currentTime = Date.now();
                 localStorage.setItem(STORAGE_KEY, currentTime.toString());
                 console.log('💾 Waktu kunjungan disimpan:', new Date(currentTime).toLocaleString());
-                
-                // Redirect ke index.html
                 window.location.href = 'index.html';
             }
 
             // ===== EKSEKUSI =====
-            // Cek apakah perlu redirect langsung
             const isRedirected = checkLastVisit();
 
-            // Jika tidak redirect (artinya tampilkan splash), pasang event listener
             if (!isRedirected) {
-                // Tombol "Masuk"
                 const btnMasuk = document.getElementById('btnMasuk');
                 if (btnMasuk) {
                     btnMasuk.addEventListener('click', function(e) {
@@ -295,22 +288,17 @@
                     });
                 }
 
-                // Klik pada gambar juga bisa masuk (opsional)
                 const splashImage = document.getElementById('splashImage');
                 if (splashImage) {
                     splashImage.addEventListener('click', function() {
                         goToIndex();
                     });
-                    // Beri kursor pointer agar user tahu bisa diklik
                     splashImage.style.cursor = 'pointer';
                 }
 
-                // Klik pada container (area sekitar) juga bisa masuk
                 const splashContainer = document.getElementById('splashContainer');
                 if (splashContainer) {
                     splashContainer.addEventListener('click', function(e) {
-                        // Jangan trigger jika yang diklik adalah tombol (sudah terhandle)
-                        // atau jika klik di dalam area yang sudah punya handler sendiri
                         if (e.target === btnMasuk || e.target.closest('.btn-masuk')) {
                             return;
                         }
@@ -321,7 +309,6 @@
                     });
                 }
 
-                // Keyboard: tekan Enter atau Space
                 document.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
@@ -332,7 +319,6 @@
                 console.log('✅ Splash siap. Klik tombol, gambar, atau area untuk masuk.');
             }
 
-            // ===== (OPSIONAL) TAMPILKAN WAKTU TERAKHIR KUNJUNGAN DI CONSOLE =====
             const lastVisit = localStorage.getItem(STORAGE_KEY);
             if (lastVisit) {
                 const date = new Date(parseInt(lastVisit, 10));
