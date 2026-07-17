@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nanjing Investment - Promo</title>
+    <style>
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a1a2b;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* ===== SPLASH CONTAINER ===== */
+        .splash-container {
+            max-width: 800px;
+            width: 100%;
+            background: linear-gradient(145deg, #0b1e2f, #07131f);
+            border-radius: 40px;
+            padding: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.96);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ===== GAMBAR IKLAN ===== */
+        .splash-image {
+            width: 100%;
+            border-radius: 24px;
+            display: block;
+            margin-bottom: 28px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .splash-image:hover {
+            transform: scale(1.01);
+        }
+
+        /* ===== BRAND ===== */
+        .brand {
+            color: #f5c842;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .brand span {
+            background: #f5c842;
+            color: #0a1a2b;
+            padding: 0 14px;
+            border-radius: 30px;
+            font-size: 22px;
+        }
+
+        .brand-sub {
+            color: #7e9bb5;
+            font-size: 13px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        /* ===== DESKRIPSI ===== */
+        .splash-desc {
+            color: #b0cbe0;
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 30px;
+            opacity: 0.85;
+        }
+
+        .splash-desc strong {
+            color: #f5c842;
+            font-weight: 600;
+        }
+
+        /* ===== TOMBOL ===== */
+        .btn-masuk {
+            background: linear-gradient(135deg, #f5c842, #dba62b);
+            border: none;
+            border-radius: 60px;
+            padding: 18px 50px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #0a1a2b;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 6px 0 #a07a1e, 0 12px 30px rgba(245, 200, 66, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 1px;
+        }
+
+        .btn-masuk:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #a07a1e, 0 18px 45px rgba(245, 200, 66, 0.35);
+        }
+
+        .btn-masuk:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #a07a1e;
+        }
+
+        .btn-masuk svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        /* ===== TIMER / COUNTER (opsional) ===== */
+        .timer-info {
+            color: #5a7a94;
+            font-size: 13px;
+            margin-top: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .timer-info span {
+            color: #f5c842;
+            font-weight: 600;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .splash-container {
+                padding: 20px;
+                border-radius: 28px;
+            }
+
+            .brand {
+                font-size: 22px;
+            }
+
+            .brand span {
+                font-size: 18px;
+                padding: 0 10px;
+            }
+
+            .splash-desc {
+                font-size: 14px;
+            }
+
+            .btn-masuk {
+                padding: 14px 32px;
+                font-size: 17px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .splash-image {
+                border-radius: 16px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .splash-container {
+                padding: 14px;
+            }
+
+            .brand {
+                font-size: 18px;
+            }
+
+            .btn-masuk {
+                font-size: 15px;
+                padding: 12px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================= -->
+    <!-- SPLASH / IKLAN -->
+    <!-- ============================================= -->
+    <div class="splash-container" id="splashContainer">
+
+        <!-- Gambar Iklan -->
+        <img 
+            src="nanjing1.jpg" 
+            alt="Nanjing Investment - Promo" 
+            class="splash-image"
+            id="splashImage"
+        />
+
+        <!-- Brand -->
+        <div class="brand">
+            NANJING <span>INV</span>
+        </div>
+        <div class="brand-sub">Investment · Kalkulator Kehidupan</div>
+
+        <!-- Deskripsi -->
+        <div class="splash-desc">
+            🌟 Dapatkan <strong>promo eksklusif</strong> untuk pengguna baru!<br />
+            Rencanakan masa depan finansialmu bersama kami.
+        </div>
+
+        <!-- Tombol Masuk -->
+        <button class="btn-masuk" id="btnMasuk">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+            </svg>
+            Masuk ke Website
+        </button>
+
+        <!-- Timer Info (opsional) -->
+        <div class="timer-info">
+            ⏱️ Iklan ini akan muncul kembali jika <span>1 jam</span> tidak aktif
+        </div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- JAVASCRIPT LOGIKA -->
+    <!-- ============================================= -->
+    <script>
+        (function() {
+            // ===== KONFIGURASI =====
+            const ONE_HOUR = 60 * 60 * 1000; // 1 jam dalam milidetik
+            const STORAGE_KEY = 'nanjing_last_visit';
+
+            // ===== CEK WAKTU KUNJUNGAN =====
+            function checkLastVisit() {
+                const lastVisit = localStorage.getItem(STORAGE_KEY);
+                const currentTime = Date.now();
+
+                if (lastVisit) {
+                    const timeDiff = currentTime - parseInt(lastVisit, 10);
+                    
+                    // Jika kurang dari 1 jam → redirect ke index
+                    if (timeDiff < ONE_HOUR) {
+                        console.log('⏳ Masih dalam 1 jam, langsung ke index...');
+                        window.location.href = 'index.html';
+                        return true; // redirect terjadi
+                    } else {
+                        console.log('⏰ Sudah lebih dari 1 jam, tampilkan splash...');
+                        // Update waktu kunjungan (akan di-update lagi saat klik tombol)
+                        return false;
+                    }
+                } else {
+                    console.log('🆕 Pertama kali buka, tampilkan splash...');
+                    return false;
+                }
+            }
+
+            // ===== FUNGSI MASUK KE INDEX =====
+            function goToIndex() {
+                // Simpan waktu kunjungan sekarang
+                const currentTime = Date.now();
+                localStorage.setItem(STORAGE_KEY, currentTime.toString());
+                console.log('💾 Waktu kunjungan disimpan:', new Date(currentTime).toLocaleString());
+                
+                // Redirect ke index.html
+                window.location.href = 'index.html';
+            }
+
+            // ===== EKSEKUSI =====
+            // Cek apakah perlu redirect langsung
+            const isRedirected = checkLastVisit();
+
+            // Jika tidak redirect (artinya tampilkan splash), pasang event listener
+            if (!isRedirected) {
+                // Tombol "Masuk"
+                const btnMasuk = document.getElementById('btnMasuk');
+                if (btnMasuk) {
+                    btnMasuk.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        goToIndex();
+                    });
+                }
+
+                // Klik pada gambar juga bisa masuk (opsional)
+                const splashImage = document.getElementById('splashImage');
+                if (splashImage) {
+                    splashImage.addEventListener('click', function() {
+                        goToIndex();
+                    });
+                    // Beri kursor pointer agar user tahu bisa diklik
+                    splashImage.style.cursor = 'pointer';
+                }
+
+                // Klik pada container (area sekitar) juga bisa masuk
+                const splashContainer = document.getElementById('splashContainer');
+                if (splashContainer) {
+                    splashContainer.addEventListener('click', function(e) {
+                        // Jangan trigger jika yang diklik adalah tombol (sudah terhandle)
+                        // atau jika klik di dalam area yang sudah punya handler sendiri
+                        if (e.target === btnMasuk || e.target.closest('.btn-masuk')) {
+                            return;
+                        }
+                        if (e.target === splashImage || e.target.closest('.splash-image')) {
+                            return;
+                        }
+                        goToIndex();
+                    });
+                }
+
+                // Keyboard: tekan Enter atau Space
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        goToIndex();
+                    }
+                });
+
+                console.log('✅ Splash siap. Klik tombol, gambar, atau area untuk masuk.');
+            }
+
+            // ===== (OPSIONAL) TAMPILKAN WAKTU TERAKHIR KUNJUNGAN DI CONSOLE =====
+            const lastVisit = localStorage.getItem(STORAGE_KEY);
+            if (lastVisit) {
+                const date = new Date(parseInt(lastVisit, 10));
+                console.log('📅 Terakhir buka:', date.toLocaleString());
+                const diff = Date.now() - parseInt(lastVisit, 10);
+                const hours = Math.floor(diff / (60 * 60 * 1000));
+                const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+                console.log(`⏱️ Selisih: ${hours} jam ${minutes} menit`);
+            } else {
+                console.log('📅 Belum pernah buka sebelumnya');
+            }
+
+        })();
+    </script>
+
+</body>
+</html>
